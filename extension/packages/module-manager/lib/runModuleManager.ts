@@ -25,7 +25,7 @@ async function runModuleManager() {
       await deleteModules(manifestObject);
       break;
     case 'recover':
-      await recoverModules(manifestObject);
+      // await recoverModules(manifestObject);
       break;
   }
 
