@@ -1,10 +1,28 @@
 const express = require("express");
+const crypto = require('crypto');
+
+
 const PORT = process.env.PORT || 3001;
 const app = express();
 
 
+// functions
+
+function generateKey() {
+    return crypto.randomBytes(32).toString('hex');
+}
+
+
+// app methods
+
 app.get("/api", (req, res) => {
-    res.json({ message: "hi from the server!!" });
+    const name = req.query.name;
+    res.json({ message: `hi from the server, ${name}!!` });
+});
+
+app.get("/key", (req, res) => {
+    const key = generateKey();
+    res.json({ key: key });
 });
 
 
