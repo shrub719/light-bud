@@ -1,6 +1,7 @@
 const express = require("express");
 const crypto = require("crypto");
-const User = require("../db/models/User")
+const User = require("../db/models/User");
+const Room = require("../db/models/Room");
 
 const router = express.Router();
 
@@ -52,7 +53,8 @@ router.get("/user", async (req, res) => {
 });
 
 router.get("/members", async (req, res) => {
-    const users = await User.find({ uuid: { $in: req.query,members } });
+    const room = await Room.findOne({ code: req.query.code });
+    const users = await User.find({ uuid: { $in: room.members } });
     res.status(200).json(users);
 })
 
