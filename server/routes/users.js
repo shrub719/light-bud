@@ -13,11 +13,13 @@ router.get("/create", async (req, res) => {
     const { salt, hash } = auth.hashKey(key);
     const user = new User({ 
         uuid: uuid,
-        key: hash,
-        salt: salt
+        auth: {
+            key: hash,
+            salt: salt
+        }
     });
     const savedUser = await user.save();
-    res.status(201).json({ user: savedUser, unhashedKey: key });
+    res.status(201).json({ user: auth.stripAuth(savedUser), unhashedKey: key });
 });
 
 router.get("/focus", async (req, res) => {
@@ -25,7 +27,7 @@ router.get("/focus", async (req, res) => {
     if (auth.verifyKey(req.query.key, user.key, user.salt)) {
         user.focusHours = req.query.focusHours;
         const savedUser = await user.save();
-        res.status(200).json(savedUser);
+        res.status(200).json(auth.stripAuth(savedUser));
     } else {
         res.status(403).send();
     }
@@ -33,18 +35,20 @@ router.get("/focus", async (req, res) => {
 
 router.get("/user", async (req, res) => {
     const user = await User.findOne({ uuid: req.query.uuid });
-    res.status(200).json(user);
+    res.status(200).json(auth.stripAuth(user));
 });
 
 router.get("/members", async (req, res) => {
     const room = await Room.findOne({ code: req.query.code });
     const users = await User.find({ uuid: { $in: room.members } });
-    res.status(200).json(users);
+    const strippedUsers = users.map(user => auth.stripAuth(user));
+    res.status(200).json(strippedUsers);
 })
 
 router.get("/users", async (req, res) => {
     const users = await User.find();
-    res.status(200).json(users);
+    const strippedUsers = users.map(user => auth.stripAuth(user));
+    res.status(200).json(strippedUsers);
 });
 
 module.exports = router; 

@@ -15,8 +15,16 @@ function verifyKey(key, hashedKey, salt) {
     return hash === hashedKey;
 }
 
+function stripAuth(user) {
+    return {
+        uuid: user.uuid,
+        data: user.data
+    };
+}
+
 module.exports = {
     generateRandom,
     hashKey,
-    verifyKey
+    verifyKey,
+    stripAuth
 };
