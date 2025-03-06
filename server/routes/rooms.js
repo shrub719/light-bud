@@ -7,12 +7,17 @@ const router = express.Router();
 
 
 router.get("/create", async (req, res) => {
-    const room = new Room( {
-        code: auth.generateRandom(),
-        members: [req.query.uuid]
-    });
-    const savedRoom = await room.save();
-    res.status(201).json(savedRoom);
+    const user = await User.findOne({ uuid: req.query.uuid });
+    if (auth.verifyKey(req.query.key, user.key, user.salt)) {
+        const room = new Room( {
+            code: auth.generateRandom(),
+            members: [req.query.uuid]
+        });
+        const savedRoom = await room.save();
+        res.status(201).json(savedRoom);
+    } else {
+        res.status(403).send();
+    }
 });
 
 router.get("/join", async (req, res) => {
