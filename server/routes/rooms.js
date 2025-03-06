@@ -1,19 +1,13 @@
 const express = require("express");
-const crypto = require("crypto");
 const Room = require("../db/models/Room");
+const auth = require("../db/auth");
 
 const router = express.Router();
 
 
-// TODO: maybe this shouldn't be duplicated
-function generateRandom() {
-    return crypto.randomBytes(32).toString('hex');
-}
-
-
 router.get("/create", async (req, res) => {
     const room = new Room( {
-        code: generateRandom(),
+        code: auth.generateRandom(),
         members: [req.query.uuid]
     });
     const savedRoom = await room.save();
