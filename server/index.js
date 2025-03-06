@@ -14,6 +14,7 @@ app.use(express.json());
 // routes
 // TODO: use post/put requests. not everything is get
 // TODO: => switch from res.query
+// TODO: should i be sending the key and salt back every time?
 
 app.use("/api/users", userRoutes);
 app.use("/api/rooms", roomRoutes);
