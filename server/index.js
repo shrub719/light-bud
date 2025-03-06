@@ -10,7 +10,8 @@ connectDB();
 app.use(express.json());
 
 
-// routes
+// route
+// TODO: change some get requests in routes to post
 
 app.use("/api/users", userRoutes);
 app.use("/api/rooms", roomRoutes);

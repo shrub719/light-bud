@@ -11,13 +11,22 @@ function generateKey() {
 }
 
 
-router.post("/create", async (req, res) => {
+router.get("/create", async (req, res) => {
     const room = new Room( {
         code: generateKey(),
-        userKeys: [req.key]
+        userKeys: [req.query.key]
     });
     const savedRoom = await room.save();
     res.status(201).json(savedRoom);
+});
+
+router.get("/join", async (req, res) => {
+    const updatedRoom = await Room.findOneAndUpdate(
+        { code: req.query.code },
+        { $push: { userKeys: req.query.key } },
+        { new: true }
+    );
+    res.status(200).json(updatedRoom);
 });
 
 router.get("/rooms", async (req, res) => {

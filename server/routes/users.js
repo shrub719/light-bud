@@ -10,7 +10,7 @@ function generateKey() {
 }
 
 
-router.post("/create", async (req, res) => {
+router.get("/create", async (req, res) => {
     const user = new User( { key: generateKey() });
     const savedUser = await user.save();
     res.status(201).json(savedUser);
