@@ -15,6 +15,7 @@ app.use(express.json());
 // TODO: use post/put requests. not everything is get
 // TODO: => switch from res.query
 // TODO: should user data and user auth stuff be stored in separate collections?
+// TODO: for now, users/users => users/* and rooms/rooms => rooms/*
 app.use("/api/users", userRoutes);
 app.use("/api/rooms", roomRoutes);
 

@@ -41,13 +41,13 @@ router.get("/user", async (req, res) => {
 router.get("/members", async (req, res) => {
     const room = await Room.findOne({ code: req.query.code });
     const users = await User.find({ uuid: { $in: room.members } });
-    const strippedUsers = users.map(user => auth.stripAuth(user));
+    const strippedUsers = users.map(auth.stripAuth);
     res.status(200).json(strippedUsers);
 })
 
 router.get("/users", async (req, res) => {
     const users = await User.find();
-    const strippedUsers = users.map(user => auth.stripAuth(user));
+    const strippedUsers = users.map(auth.stripAuth);
     res.status(200).json(strippedUsers);
 });
 
