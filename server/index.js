@@ -5,6 +5,8 @@ const crypto = require('crypto');
 const connectDB = require("./db/db");
 const User = require("./db/models/User")
 
+// route imports
+const userRoutes = require('./routes/users');
 
 const PORT = process.env.PORT || 3001;
 const app = express();
@@ -13,25 +15,14 @@ connectDB();
 app.use(express.json());
 
 
-// functions
-
-function generateKey() {
-    return crypto.randomBytes(32).toString('hex');
-}
-
-
 // routes
+
+app.use('/users', userRoutes);
 
 app.get("/test", (req, res) => {
     const name = req.query.name;
     res.json({ message: `hi from the server, ${name}!!` });
 });
-
-app.get("/key", (req, res) => {
-    const key = generateKey();
-    res.json({ key: key });
-});
-
 
 app.listen(PORT, () => {
     console.log(`server listening on port ${PORT}`);
