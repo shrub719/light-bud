@@ -15,8 +15,8 @@ app.use(express.json());
 // TODO: use post/put requests. not everything is get
 // TODO: => switch from res.query
 
-app.use("/api/user", userRoutes);
-app.use("/api/room", roomRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/rooms", roomRoutes);
 
 app.get("/test", (req, res) => {
     const name = req.query.name;
