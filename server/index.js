@@ -10,8 +10,9 @@ connectDB();
 app.use(express.json());
 
 
-// route
-// TODO: change some get requests in routes to post
+// routes
+// TODO: use post/put requests. not everything is get
+// TODO: => switch from res.query
 
 app.use("/api/users", userRoutes);
 app.use("/api/rooms", roomRoutes);
