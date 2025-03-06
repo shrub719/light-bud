@@ -1,4 +1,5 @@
 const express = require("express");
+const User = require("../db/models/User")
 const Room = require("../db/models/Room");
 const auth = require("../db/auth");
 
@@ -15,12 +16,17 @@ router.get("/create", async (req, res) => {
 });
 
 router.get("/join", async (req, res) => {
-    const updatedRoom = await Room.findOneAndUpdate(
-        { code: req.query.code },
-        { $push: { members: req.query.uuid } },
-        { new: true }
-    );
-    res.status(200).json(updatedRoom);
+    const user = await User.findOne({ uuid: req.query.uuid });
+    if (auth.verifyKey(req.query.key, user.key, user.salt)) {
+        const updatedRoom = await Room.findOneAndUpdate(
+            { code: req.query.code },
+            { $push: { members: req.query.uuid } },
+            { new: true }
+        );
+        res.status(200).json(updatedRoom);
+    } else {
+        res.status(403).send();
+    }
 });
 
 router.get("/room", async (req, res) => {

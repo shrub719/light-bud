@@ -27,7 +27,7 @@ router.get("/focus", async (req, res) => {
         const savedUser = await user.save();
         res.status(200).json(savedUser);
     } else {
-        res.status(403);
+        res.status(403).send();
     }
 });
 
