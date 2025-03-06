@@ -1,12 +1,7 @@
 const express = require("express");
-const crypto = require('crypto');
-
-// db imports
 const connectDB = require("./db/db");
-const User = require("./db/models/User")
-
-// route imports
-const userRoutes = require('./routes/users');
+const userRoutes = require("./routes/users");
+const roomRoutes = require("./routes/rooms");
 
 const PORT = process.env.PORT || 3001;
 const app = express();
@@ -17,7 +12,8 @@ app.use(express.json());
 
 // routes
 
-app.use('/users', userRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/rooms", roomRoutes);
 
 app.get("/test", (req, res) => {
     const name = req.query.name;
