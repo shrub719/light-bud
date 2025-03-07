@@ -28,9 +28,7 @@ const manifest = {
   },
   version: packageJson.version,
   description: 'Productivity pet that lives in your browser.',
-  host_permissions: ['<all_urls>'],
   permissions: ['storage', 'alarms', 'tabs', 'notifications'],
-  options_page: 'options/index.html',
   background: {
     service_worker: 'background.js',
     type: 'module',
@@ -39,7 +37,6 @@ const manifest = {
     default_popup: 'popup/index.html',
     default_icon: 'icon-34.png',
   },
-  chrome_url_overrides: {},
   icons: {
     '128': 'icon-128.png',
   },
