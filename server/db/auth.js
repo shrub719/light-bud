@@ -27,7 +27,11 @@ function getKey(req) {
 }
 
 function authenticate(req, user) {
-    return verifyKey(getKey(req), user.auth.key, user.auth.salt);
+    try {
+        return verifyKey(getKey(req), user.auth.key, user.auth.salt);
+    } catch (err) {
+        return false
+    }
 }
 
 module.exports = {

@@ -9,6 +9,7 @@ const router = express.Router();
 
 router.post("/create", async (req, res) => {
     const user = await User.findOne({ uuid: req.body.uuid });
+    if (!user) return res.status(400).send();
     if (auth.authenticate(req, user)) {
         const room = new Room( {
             code: auth.generateRandom(),
@@ -23,12 +24,14 @@ router.post("/create", async (req, res) => {
 
 router.put("/join", async (req, res) => {
     const user = await User.findOne({ uuid: req.body.uuid });
+    if (!user) return res.status(400).send();
     if (auth.authenticate(req, user)) {
         const updatedRoom = await Room.findOneAndUpdate(
             { code: req.body.code },
             { $push: { members: req.body.uuid } },
             { new: true }
         );
+        if (!updatedRoom) return res.status(400).json({ error: "A room with that code does not exist!" });
         res.status(200).json(updatedRoom);
     } else {
         res.status(403).send();
@@ -37,6 +40,7 @@ router.put("/join", async (req, res) => {
 
 router.get("/room", async (req, res) => {
     const room = await Room.findOne({ code: req.query.code });
+    if (!room) return res.status(400).json({ error: "A room with that code does not exist!" });
     res.status(200).json(room);
 });
 
