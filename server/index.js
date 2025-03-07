@@ -1,4 +1,5 @@
 const express = require("express");
+require("express-async-errors");
 const path = require("path");
 const connectDB = require("./db/db");
 const userRoutes = require("./routes/users");
@@ -14,10 +15,8 @@ app.use(express.static(path.resolve(__dirname, '../client/dist')));
 
 
 // routes
-// TODO: use post/put requests. not everything is get
-// TODO: => switch from res.query
 // TODO: should user data and user auth stuff be stored in separate collections?
-// TODO: error handling so it doesn't crash when no params are passed
+// TODO: express-validator
 // TODO: use middleware instead of the same auth if statement every time
 app.use("/api/users", userRoutes);
 app.use("/api/rooms", roomRoutes);
