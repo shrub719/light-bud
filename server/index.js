@@ -17,9 +17,8 @@ app.use(express.static(path.resolve(__dirname, '../client/dist')));
 // TODO: use post/put requests. not everything is get
 // TODO: => switch from res.query
 // TODO: should user data and user auth stuff be stored in separate collections?
-// TODO: for now, users/users => users/* and rooms/rooms => rooms/*
 // TODO: error handling so it doesn't crash when no params are passed
-// TODO: some admin authentication for viewing the list of users/rooms
+// TODO: use middleware instead of the same auth if statement every time
 app.use("/api/users", userRoutes);
 app.use("/api/rooms", roomRoutes);
 

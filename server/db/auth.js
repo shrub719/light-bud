@@ -10,9 +10,9 @@ function hashKey(key) {
     return { salt, hash };
 }
 
-function verifyKey(key, hashedKey, salt) {
-    const hash = crypto.pbkdf2Sync(key, salt, 100000, 64, 'sha512').toString('hex');
-    return hash === hashedKey;
+function verifyKey(sentKey, storedKey, salt) {
+    const hash = crypto.pbkdf2Sync(sentKey, salt, 100000, 64, 'sha512').toString('hex');
+    return hash === storedKey;
 }
 
 function stripAuth(user) {
@@ -22,9 +22,19 @@ function stripAuth(user) {
     };
 }
 
+function getKey(req) {
+    return req.headers.authorisation.split(" ")[1];
+}
+
+function authenticate(req, user) {
+    return verifyKey(getKey(req), user.auth.key, user.auth.salt);
+}
+
 module.exports = {
     generateRandom,
     hashKey,
     verifyKey,
-    stripAuth
+    stripAuth,
+    getKey,
+    authenticate
 };

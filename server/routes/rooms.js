@@ -3,15 +3,16 @@ const User = require("../db/models/User")
 const Room = require("../db/models/Room");
 const auth = require("../db/auth");
 
+require("dotenv").config();
 const router = express.Router();
 
 
-router.get("/create", async (req, res) => {
-    const user = await User.findOne({ uuid: req.query.uuid });
-    if (auth.verifyKey(req.query.key, user.key, user.salt)) {
+router.post("/create", async (req, res) => {
+    const user = await User.findOne({ uuid: req.body.uuid });
+    if (auth.authenticate(req, user)) {
         const room = new Room( {
             code: auth.generateRandom(),
-            members: [req.query.uuid]
+            members: [req.body.uuid]
         });
         const savedRoom = await room.save();
         res.status(201).json(savedRoom);
@@ -20,12 +21,12 @@ router.get("/create", async (req, res) => {
     }
 });
 
-router.get("/join", async (req, res) => {
-    const user = await User.findOne({ uuid: req.query.uuid });
-    if (auth.verifyKey(req.query.key, user.key, user.salt)) {
+router.post("/join", async (req, res) => {
+    const user = await User.findOne({ uuid: req.body.uuid });
+    if (auth.authenticate(req, user)) {
         const updatedRoom = await Room.findOneAndUpdate(
-            { code: req.query.code },
-            { $push: { members: req.query.uuid } },
+            { code: req.body.code },
+            { $push: { members: req.body.uuid } },
             { new: true }
         );
         res.status(200).json(updatedRoom);
@@ -35,13 +36,17 @@ router.get("/join", async (req, res) => {
 });
 
 router.get("/room", async (req, res) => {
-    const room = await Room.findOne({ code: req.query.code });
+    const room = await Room.findOne({ code: req.body.code });
     res.status(200).json(room);
 });
 
 router.get("/", async (req, res) => {
-    const rooms = await Room.find();
-    res.status(200).json(rooms);
+    if (auth.getKey(req) === process.env.PASSWORD) {
+        const rooms = await Room.find();
+        res.status(200).json(rooms);
+    } else {
+        res.status(403).send();
+    }
 });
 
 module.exports = router; 
