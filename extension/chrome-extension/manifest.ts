@@ -19,16 +19,15 @@ const packageJson = JSON.parse(readFileSync('./package.json', 'utf8'));
  */
 const manifest = {
   manifest_version: 3,
-  default_locale: 'en',
-  name: '__MSG_extensionName__',
+  name: 'Light Bud',
   browser_specific_settings: {
     gecko: {
-      id: 'example@example.com',
+      id: 'light-bud@shrub719.com',
       strict_min_version: '109.0',
     },
   },
   version: packageJson.version,
-  description: '__MSG_extensionDescription__',
+  description: 'Productivity pet that lives in your browser.',
   host_permissions: ['<all_urls>'],
   permissions: ['storage', 'scripting', 'tabs', 'notifications'],
   options_page: 'options/index.html',
