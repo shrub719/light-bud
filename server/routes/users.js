@@ -45,7 +45,7 @@ router.get("/members", async (req, res) => {
     res.status(200).json(strippedUsers);
 })
 
-router.get("/users", async (req, res) => {
+router.get("/", async (req, res) => {
     const users = await User.find();
     const strippedUsers = users.map(auth.stripAuth);
     res.status(200).json(strippedUsers);

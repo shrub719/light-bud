@@ -39,7 +39,7 @@ router.get("/room", async (req, res) => {
     res.status(200).json(room);
 });
 
-router.get("/rooms", async (req, res) => {
+router.get("/", async (req, res) => {
     const rooms = await Room.find();
     res.status(200).json(rooms);
 });
