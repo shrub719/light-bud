@@ -23,7 +23,7 @@ router.post("/create", async (req, res) => {
     res.status(201).json({ user: auth.stripAuth(savedUser), unhashedKey: key });
 });
 
-router.post("/edit", async (req, res) => {
+router.put("/edit", async (req, res) => {
     const user = await User.findOne({ uuid: req.body.uuid });
     if (auth.authenticate(req, user)) {
         user.data = req.body.data;
@@ -34,13 +34,13 @@ router.post("/edit", async (req, res) => {
     }
 });
 
-router.post("/user", async (req, res) => {
-    const user = await User.findOne({ uuid: req.body.uuid });
+router.get("/user", async (req, res) => {
+    const user = await User.findOne({ uuid: req.query.uuid });
     res.status(200).json(auth.stripAuth(user));
 });
 
-router.post("/members", async (req, res) => {
-    const room = await Room.findOne({ code: req.body.code });
+router.get("/members", async (req, res) => {
+    const room = await Room.findOne({ code: req.query.code });
     const users = await User.find({ uuid: { $in: room.members } });
     const strippedUsers = users.map(auth.stripAuth);
     res.status(200).json(strippedUsers);

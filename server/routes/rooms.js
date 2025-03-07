@@ -21,7 +21,7 @@ router.post("/create", async (req, res) => {
     }
 });
 
-router.post("/join", async (req, res) => {
+router.put("/join", async (req, res) => {
     const user = await User.findOne({ uuid: req.body.uuid });
     if (auth.authenticate(req, user)) {
         const updatedRoom = await Room.findOneAndUpdate(
@@ -36,7 +36,7 @@ router.post("/join", async (req, res) => {
 });
 
 router.get("/room", async (req, res) => {
-    const room = await Room.findOne({ code: req.body.code });
+    const room = await Room.findOne({ code: req.query.code });
     res.status(200).json(room);
 });
 
