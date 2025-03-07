@@ -43,11 +43,11 @@ router.put("/leave", async (req, res) => {
     if (!user) return res.status(400).send();
     if (auth.authenticate(req, user)) {
         const updatedRoom = await Room.findOneAndUpdate(
-            {code: req.body.code },
+            { code: req.body.code },
             { $pull: { members: req.body.uuid } },
             { new: true }
         );
-        if (!updatedRoom) return res.status(400).json({ error: "A room with that code does not exist! "});
+        if (!updatedRoom) return res.status(400).json({ error: "A room with that code does not exist!" });
         res.status(200).json(updatedRoom);
     } else {
         res.status(403).send();
