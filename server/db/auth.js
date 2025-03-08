@@ -1,4 +1,5 @@
 const crypto = require("crypto");
+const User = require("./models/User");
 
 function generateRandom() {
     return crypto.randomBytes(32).toString('hex');
@@ -25,11 +26,22 @@ function getKey(req) {
     return req.headers.authorisation.split(" ")[1];
 }
 
-function authenticate(req, user) {
+function checkKey(req, user) {
     try {
         return verifyKey(getKey(req), user.auth.key, user.auth.salt);
     } catch (err) {
         return false
+    }
+}
+
+async function authenticate(req, res, next) {
+    const user = await User.findOne({ uuid: req.body.uuid });
+    if (!user) return res.status(400).send();
+    if (checkKey(req, user)) {
+        req.user = user;
+        next();
+    } else {
+        res.status(403).send();
     }
 }
 
@@ -39,5 +51,6 @@ module.exports = {
     verifyKey,
     stripAuth,
     getKey,
+    checkKey,
     authenticate
 };

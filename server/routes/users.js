@@ -33,27 +33,6 @@ router.post("/create", async (req, res) => {
     res.status(201).json({ user: auth.stripAuth(savedUser), unhashedKey: key });
 });
 
-// TODO: make authentication middleware, please
-router.put("/edit", async (req, res) => {
-    const user = await User.findOne({ uuid: req.body.uuid });
-    if (!user) return res.status(400).send();
-    if (auth.authenticate(req, user)) {
-        // TODO: maybe change this so i don't have to update it every time the user model updates
-        if (req.body.stats) user.stats = req.body.stats;
-        if (req.body.profile) {
-            if (matcher.hasMatch(req.body.profile.username)) {
-                return res.status(400).json({ error: "Username can't have any bad language in it!" });
-            }
-            user.profile = req.body.profile;
-        }
-
-        const savedUser = await user.save();
-        res.status(200).json(auth.stripAuth(savedUser));
-    } else {
-        res.status(403).send();
-    }
-});
-
 router.get("/user", async (req, res) => {
     const user = await User.findOne({ uuid: req.query.uuid });
     if (!user) return res.status(400).send();
@@ -76,6 +55,23 @@ router.get("/", async (req, res) => {
     } else {
         res.status(403).send();
     }
+});
+
+router.use((req, res, next) => auth.authenticate(req, res, next));
+
+router.put("/edit", async (req, res) => {
+    const user = req.user;
+    // TODO: maybe change this so i don't have to update it every time the user model updates
+    if (req.body.stats) user.stats = req.body.stats;
+    if (req.body.profile) {
+        if (matcher.hasMatch(req.body.profile.username)) {
+            return res.status(400).json({ error: "Username can't have any bad language in it!" });
+        }
+        user.profile = req.body.profile;
+    }
+
+    const savedUser = await user.save();
+    res.status(200).json(auth.stripAuth(savedUser));
 });
 
 module.exports = router; 
