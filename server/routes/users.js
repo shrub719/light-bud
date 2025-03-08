@@ -57,7 +57,7 @@ router.get("/", async (req, res) => {
     }
 });
 
-router.use((req, res, next) => auth.authenticate(req, res, next));
+router.use(auth.authenticate);
 
 router.put("/edit", async (req, res) => {
     const user = req.user;
