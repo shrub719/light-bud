@@ -17,6 +17,7 @@ async function handleRoom(req, res, update) {
             { new: true }
         );
         if (!updatedRoom) return res.status(400).json({ error: "A room with that code does not exist!" });
+        if (updatedRoom.members.length === 0) await updatedRoom.deleteOne();
         res.status(200).json(updatedRoom);
     } else {
         res.status(403).send();
