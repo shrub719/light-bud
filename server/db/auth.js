@@ -16,10 +16,9 @@ function verifyKey(sentKey, storedKey, salt) {
 }
 
 function stripAuth(user) {
-    return {
-        uuid: user.uuid,
-        data: user.data
-    };
+    const userObject = user.toObject();
+    const {auth, ...strippedUser} = userObject;
+    return strippedUser;
 }
 
 function getKey(req) {
