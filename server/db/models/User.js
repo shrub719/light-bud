@@ -6,8 +6,12 @@ const userSchema = new mongoose.Schema({
         key: { type: String, required: true },
         salt: { type: String, required: true }
     },
-    data: {
+    stats: {
         focusHours: { type: Number, default: 0 },
+    },
+    profile: {
+        username: { type: String, default: "Light Bud User" },
+        icon: { type: [String], default: ["cat-happy", "blue"] } 
     }
 });
 

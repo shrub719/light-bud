@@ -2,9 +2,19 @@ const express = require("express");
 const User = require("../db/models/User");
 const Room = require("../db/models/Room");
 const auth = require("../db/auth");
+const {
+	RegExpMatcher,
+	TextCensor,
+	englishDataset,
+	englishRecommendedTransformers,
+} = require('obscenity');
 
 require("dotenv").config();
 const router = express.Router();
+const matcher = new RegExpMatcher({
+	...englishDataset.build(),
+	...englishRecommendedTransformers,
+});
 
 
 // TODO: what if a uuid ever clashes?
@@ -23,11 +33,20 @@ router.post("/create", async (req, res) => {
     res.status(201).json({ user: auth.stripAuth(savedUser), unhashedKey: key });
 });
 
+// TODO: make authentication middleware, please
 router.put("/edit", async (req, res) => {
     const user = await User.findOne({ uuid: req.body.uuid });
     if (!user) return res.status(400).send();
     if (auth.authenticate(req, user)) {
-        user.data = req.body.data;
+        // TODO: maybe change this so i don't have to update it every time the user model updates
+        if (req.body.stats) user.stats = req.body.stats;
+        if (req.body.profile) {
+            if (matcher.hasMatch(req.body.profile.username)) {
+                return res.status(400).json({ error: "Username can't have any bad language in it!" });
+            }
+            user.profile = req.body.profile;
+        }
+
         const savedUser = await user.save();
         res.status(200).json(auth.stripAuth(savedUser));
     } else {
