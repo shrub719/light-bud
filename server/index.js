@@ -17,7 +17,6 @@ app.use(express.static(path.resolve(__dirname, '../client/dist')));
 // routes
 // TODO: should user data and user auth stuff be stored in separate collections?
 // TODO: express-validator
-// TODO: use middleware instead of the same auth if statement every time
 app.use("/api/users", userRoutes);
 app.use("/api/rooms", roomRoutes);
 
