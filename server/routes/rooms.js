@@ -22,6 +22,7 @@ router.post("/create", async (req, res) => {
     }
 });
 
+// TODO: join and leave are practically the same function?
 router.put("/join", async (req, res) => {
     const user = await User.findOne({ uuid: req.body.uuid });
     if (!user) return res.status(400).send();

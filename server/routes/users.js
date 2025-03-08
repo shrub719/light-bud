@@ -27,7 +27,11 @@ router.put("/edit", async (req, res) => {
     const user = await User.findOne({ uuid: req.body.uuid });
     if (!user) return res.status(400).send();
     if (auth.authenticate(req, user)) {
-        user.data = req.body.data;
+        // TODO: maybe change this so i don't have to update it every time the user model updates
+        // TODO: make sure usernames aren't explicit
+        if (req.body.stats) user.stats = req.body.stats;
+        if (req.body.profile) user.profile = req.body.profile;
+
         const savedUser = await user.save();
         res.status(200).json(auth.stripAuth(savedUser));
     } else {
