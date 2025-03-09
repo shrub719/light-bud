@@ -33,13 +33,8 @@ router.post("/create", async (req, res) => {
     res.status(201).json({ user: auth.stripAuth(savedUser), unhashedKey: key });
 });
 
-router.get("/user", async (req, res) => {
-    const user = await User.findOne({ uuid: req.query.uuid });
-    if (!user) return res.status(400).send();
-    res.status(200).json(auth.stripAuth(user));
-});
-
 router.get("/members", async (req, res) => {
+    // TODO: strip shop from public user data?
     const room = await Room.findOne({ code: req.query.code });
     if (!room) return res.status(400).send();
     const users = await User.find({ uuid: { $in: room.members } });
@@ -58,6 +53,11 @@ router.get("/", async (req, res) => {
 });
 
 router.use(auth.authenticate);
+
+router.get("/user", async (req, res) => {
+    const user = req.user;
+    res.status(200).json(auth.stripAuth(user));
+});
 
 router.put("/edit", async (req, res) => {
     const user = req.user;
