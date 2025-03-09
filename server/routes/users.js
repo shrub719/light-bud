@@ -74,4 +74,25 @@ router.put("/user", async (req, res) => {
     res.status(200).json(auth.stripAuth(savedUser));
 });
 
+router.post("/buy", async (req, res) => {
+    // NOTE: req.item is the item to unlock
+    //       remember to change result logic
+    const user = req.user;
+    if (user.shop.unlocked.includes(req.item)) {
+        return res.status(400).json({ error: "You already have that item!" });   // obviously shouldn't happen but just in case
+    }
+    // TODO: payment gateway or whatever
+    const result = { success: true };
+    if (result.success) {
+        const updatedUser = await User.findByIdAndUpdate(
+            { _id: user._id },
+            { $addToSet: { "shop.unlocked": req.body.uuid } },
+            { new: true }
+        );
+        res.status(200).json({ result: result, user: auth.stripAuth(updatedUser) });
+    } else {
+        res.status(500).json({ result: result });
+    }
+});
+
 module.exports = router; 
