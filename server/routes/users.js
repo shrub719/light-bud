@@ -63,8 +63,13 @@ router.put("/user", async (req, res) => {
     // TODO: maybe change this so i don't have to update it every time the user model updates
     if (req.body.stats) user.stats = req.body.stats;
     if (req.body.profile) {
-        if (matcher.hasMatch(req.body.profile.username)) {
+        const username = req.body.profile.username;
+        if (matcher.hasMatch(username)) {
             return res.status(400).json({ error: "Username can't have any bad language in it!" });
+        } else if (!auth.validateUsername(username)) {
+            return res.status(400).json({ error: "Username can't contain any special characters." });
+        } else if (!(1 <= username.length <= 20)) {
+            return res.status(400).json({ error: "Username has to be between 1 and 20 characters." })
         }
         user.profile = req.body.profile;
     }

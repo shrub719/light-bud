@@ -53,6 +53,12 @@ async function authenticate(req, res, next) {
     }
 }
 
+function validateUsername(username) {
+    // allow only alphanumeric characters and underscores
+    const regex = /^[a-zA-Z0-9_ ]+$/;
+    return regex.test(username);
+}
+
 module.exports = {
     generateRandom,
     hashKey,
@@ -60,5 +66,6 @@ module.exports = {
     stripAuth,
     getKey,
     checkKey,
-    authenticate
+    authenticate,
+    validateUsername
 };
