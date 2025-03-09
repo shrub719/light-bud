@@ -59,7 +59,7 @@ router.get("/user", async (req, res) => {
     res.status(200).json(auth.stripAuth(user));
 });
 
-router.put("/edit", async (req, res) => {
+router.put("/user", async (req, res) => {
     const user = req.user;
     // TODO: maybe change this so i don't have to update it every time the user model updates
     if (req.body.stats) user.stats = req.body.stats;
