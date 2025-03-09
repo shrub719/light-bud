@@ -60,7 +60,6 @@ router.get("/user", async (req, res) => {
 
 router.put("/user", async (req, res) => {
     const user = req.user;
-    // TODO: maybe change this so i don't have to update it every time the user model updates
     if (req.body.stats) user.stats = req.body.stats;
     if (req.body.profile) {
         const username = req.body.profile.username;
