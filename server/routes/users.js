@@ -34,11 +34,10 @@ router.post("/create", async (req, res) => {
 });
 
 router.get("/members", async (req, res) => {
-    // TODO: strip shop from public user data?
     const room = await Room.findOne({ code: req.query.code });
     if (!room) return res.status(400).send();
     const users = await User.find({ uuid: { $in: room.members } });
-    const strippedUsers = users.map(auth.stripAuth);
+    const strippedUsers = users.map(user => auth.stripAuth(user, public=true));
     res.status(200).json(strippedUsers);
 })
 
