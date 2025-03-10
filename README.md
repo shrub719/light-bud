@@ -1,2 +1,10 @@
 # Light Bud
-Productivity pet that lives in your browser. This rewrite is currently in progress, see the legacy version [here](https://github.com/shrub719/light-bud-legacy).
+Productivity pet that lives in your browser.  
+This rewrite is currently in progress, see the legacy version [here](https://github.com/shrub719/light-bud-legacy).
+
+## How to Contribute
+
+Fork and clone this repository to start working.  
+### Contribution Instructions and Documentation
+- [Server](server/README.md)
+- [Extension](extension/README.md)

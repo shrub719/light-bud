@@ -7,7 +7,7 @@ const {
 	TextCensor,
 	englishDataset,
 	englishRecommendedTransformers,
-} = require('obscenity');
+} = require("obscenity");
 
 require("dotenv").config();
 const router = express.Router();
@@ -34,11 +34,10 @@ router.post("/create", async (req, res) => {
 });
 
 router.get("/members", async (req, res) => {
-    // TODO: strip shop from public user data?
     const room = await Room.findOne({ code: req.query.code });
     if (!room) return res.status(400).send();
     const users = await User.find({ uuid: { $in: room.members } });
-    const strippedUsers = users.map(auth.stripAuth);
+    const strippedUsers = users.map(user => auth.stripAuth(user, public=true));
     res.status(200).json(strippedUsers);
 })
 
@@ -61,11 +60,17 @@ router.get("/user", async (req, res) => {
 
 router.put("/user", async (req, res) => {
     const user = req.user;
-    // TODO: maybe change this so i don't have to update it every time the user model updates
     if (req.body.stats) user.stats = req.body.stats;
     if (req.body.profile) {
-        if (matcher.hasMatch(req.body.profile.username)) {
+        const username = req.body.profile.username;
+        if (matcher.hasMatch(username)) {
             return res.status(400).json({ error: "Username can't have any bad language in it!" });
+        }
+        if (!(1 <= username.length && username.length <= 20)) {
+            return res.status(400).json({ error: "Username has to be between 1 and 20 characters." });
+        }
+        if (!auth.validateUsername(username)) {
+            return res.status(400).json({ error: "Username can't contain any special characters." });
         }
         user.profile = req.body.profile;
     }

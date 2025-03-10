@@ -16,9 +16,17 @@ function verifyKey(sentKey, storedKey, salt) {
     return hash === storedKey;
 }
 
-function stripAuth(user) {
+function stripAuth(user, public=false) {
+    // public: true if data is available to any user
     const userObject = user.toObject();
-    const {auth, ...strippedUser} = userObject;
+    let strippedUser = {};
+    if (public) {
+        const { auth, shop, ...strippedUserObject } = userObject;
+        strippedUser = strippedUserObject;
+    } else {
+        const { auth, ...strippedUserObject } = userObject;
+        strippedUser = strippedUserObject;
+    }
     return strippedUser;
 }
 
@@ -45,6 +53,12 @@ async function authenticate(req, res, next) {
     }
 }
 
+function validateUsername(username) {
+    // allow only alphanumeric characters and underscores
+    const regex = /^[a-zA-Z0-9_ ]+$/;
+    return regex.test(username);
+}
+
 module.exports = {
     generateRandom,
     hashKey,
@@ -52,5 +66,6 @@ module.exports = {
     stripAuth,
     getKey,
     checkKey,
-    authenticate
+    authenticate,
+    validateUsername
 };
