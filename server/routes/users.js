@@ -7,7 +7,7 @@ const {
 	TextCensor,
 	englishDataset,
 	englishRecommendedTransformers,
-} = require('obscenity');
+} = require("obscenity");
 
 require("dotenv").config();
 const router = express.Router();
