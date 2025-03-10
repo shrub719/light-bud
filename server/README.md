@@ -48,4 +48,4 @@ I recommend using the [Restman](https://chromewebstore.google.com/detail/restman
 Target `http://localhost:3000/`, replacing `3000` with your chosen port in `.env`.  
 
 To view the database, use MongoDBCompass which came with your installation of MongoDB. <!-- do they have to create the connection? -->  
-Alternatively, use the `/users` and `/rooms` endpoints passing in your password from `.env.PASSWORD` in the header as `Key: Bearer <PASSWORD>`.
+Alternatively, use the `/users` and `/rooms` endpoints passing in your password from `.env.PASSWORD` in the header as `Authentication: Bearer <PASSWORD>`.
