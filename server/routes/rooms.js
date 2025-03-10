@@ -7,6 +7,7 @@ require("dotenv").config();
 const router = express.Router();
 
 
+// TODO: extract strings so you can change them more easily
 MAX_MEMBERS = 8
 async function handleRoom(req, res, update) {
     const room = await Room.findOne({ code: req.body.code });
