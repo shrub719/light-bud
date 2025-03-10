@@ -8,6 +8,7 @@ export default defineBackground({
 
         // first install
         // TODO: what if server isn't online/available?
+        // TODO: remember to change urls from localhost
         browser.runtime.onInstalled.addListener(async ({ reason }) => {
             if (reason === "install") {
                 console.log("extension installed");
