@@ -1,4 +1,4 @@
-import { initUser } from "./utils/user.ts";
+import { initUser } from "./utils/user";
 
 export default defineBackground({
     persistent: true,
@@ -9,7 +9,7 @@ export default defineBackground({
         // first install
         // TODO: what if server isn't online/available?
         // TODO: remember to change urls from localhost
-        browser.runtime.onInstalled.addListener(async ({ reason }) => {
+        browser.runtime.onInstalled.addListener(async ({ reason }: any) => {
             if (reason === "install") {
                 console.log("extension installed");
                 const ok = await initUser();
