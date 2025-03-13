@@ -53,13 +53,13 @@ router.put("/user", slow, async (req: Request, res): Promise<any> => {
     if (req.body.profile) {
         const username = req.body.profile.username;
         if (matcher.hasMatch(username)) {
-            return res.status(400).json({ error: "Username can't have any bad language in it!" });
+            return res.status(400).json({ error: "user-badlanguage" });
         }
         if (!(1 <= username.length && username.length <= 20)) {
-            return res.status(400).json({ error: "Username has to be between 1 and 20 characters." });
+            return res.status(400).json({ error: "user-length" });
         }
         if (!auth.validateUsername(username)) {
-            return res.status(400).json({ error: "Username can't contain any special characters." });
+            return res.status(400).json({ error: "user-special" });
         }
         user.profile = req.body.profile;
     }
@@ -73,7 +73,7 @@ router.post("/buy", slow, async (req: Request, res): Promise<any> => {
     //       remember to change result logic
     const user: any = req.user;
     if (user.shop.unlocked.includes(req.body.item)) {
-        return res.status(400).json({ error: "You already have that item!" });   // obviously shouldn't happen but just in case
+        return res.status(400).json({ error: "shop-owned" });   // obviously shouldn't happen but just in case
     }
     // TODO: payment gateway or whatever
     const result = { success: true };
