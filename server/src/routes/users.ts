@@ -1,4 +1,5 @@
-const express = require("express");
+import express, { Router, Request } from "express";
+import { Document } from "mongodb";
 const User = require("../utils/models/User");
 const Room = require("../utils/models/Room");
 const auth = require("../utils/auth");
@@ -10,11 +11,12 @@ const {
 } = require("obscenity");
 
 require("dotenv").config();
-const router = express.Router();
+const router: Router = express.Router();
 const matcher = new RegExpMatcher({
 	...englishDataset.build(),
 	...englishRecommendedTransformers,
 });
+
 
 
 // TODO: what if a uuid ever clashes?
@@ -30,14 +32,14 @@ router.post("/create", async (req, res) => {
         }
     });
     const savedUser = await user.save();
-    res.status(201).json({ user: auth.stripAuth(savedUser), unhashedKey: key });
+    res.status(201).json({ user: auth.stripAuth(savedUser), unhashedKey: key }).status(201);
 });
 
-router.get("/members", async (req, res) => {
+router.get("/members", async (req, res): Promise<any> => {
     const room = await Room.findOne({ code: req.query.code });
     if (!room) return res.status(400).send();
     const users = await User.find({ uuid: { $in: room.members } });
-    const strippedUsers = users.map(user => auth.stripAuth(user, public=true));
+    const strippedUsers = users.map((user: Document) => auth.stripAuth(user, true));
     res.status(200).json(strippedUsers);
 })
 
@@ -53,13 +55,13 @@ router.get("/", async (req, res) => {
 
 router.use(auth.authenticate);
 
-router.get("/user", async (req, res) => {
+router.get("/user", async (req: Request, res) => {
     const user = req.user;
     res.status(200).json(auth.stripAuth(user));
 });
 
-router.put("/user", async (req, res) => {
-    const user = req.user;
+router.put("/user", async (req: Request, res): Promise<any> => {
+    const user: any = req.user;
     if (req.body.stats) user.stats = req.body.stats;
     if (req.body.profile) {
         const username = req.body.profile.username;
@@ -79,10 +81,10 @@ router.put("/user", async (req, res) => {
     res.status(200).json(auth.stripAuth(savedUser));
 });
 
-router.post("/buy", async (req, res) => {
-    // NOTE: req.item is the item to unlock
+router.post("/buy", async (req: Request, res): Promise<any> => {
+    // NOTE: req.body.item is the item to unlock
     //       remember to change result logic
-    const user = req.user;
+    const user: any = req.user;
     if (user.shop.unlocked.includes(req.body.item)) {
         return res.status(400).json({ error: "You already have that item!" });   // obviously shouldn't happen but just in case
     }

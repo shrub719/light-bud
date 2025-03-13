@@ -1,16 +1,17 @@
-const express = require("express");
+import express, { Router, Request, Response } from "express";
+import { Document } from "mongodb";
 const User = require("../utils/models/User")
 const Room = require("../utils/models/Room");
 const auth = require("../utils/auth");
 
 require("dotenv").config();
-const router = express.Router();
+const router: Router = express.Router();
 
 
 // TODO: extract strings so you can change them more easily
-MAX_MEMBERS = 8
-async function handleRoom(req, res, update) {
-    const room = await Room.findOne({ code: req.body.code });
+const MAX_MEMBERS = 8
+async function handleRoom(req: Request, res: Response, update: object): Promise<any> {
+    const room: Document = await Room.findOne({ code: req.body.code });
     if (!room) return res.status(400).json({ error: "A room with that code does not exist!" });
     if (room.members.length >= MAX_MEMBERS) return res.status(400).json({ error: "Sorry, that room is full!" });
 
@@ -26,7 +27,7 @@ async function handleRoom(req, res, update) {
 }
 
 
-router.get("/room", async (req, res) => {
+router.get("/room", async (req, res): Promise<any> => {
     const room = await Room.findOne({ code: req.query.code });
     if (!room) return res.status(400).json({ error: "A room with that code does not exist!" });
     res.status(200).json(room);

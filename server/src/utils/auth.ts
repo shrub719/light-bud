@@ -1,20 +1,20 @@
-const cryptoLib = require("crypto");
+import crypto from "crypto";
 const User = require("./models/User");
 import { Document } from "mongodb";
 import { Request, Response } from "express";
 
 function generateRandom() {
-    return cryptoLib.randomBytes(32).toString('hex');
+    return crypto.randomBytes(32).toString('hex');
 }
 
 function hashKey(key: string) {
-    const salt: string = cryptoLib.randomBytes(16).toString('hex');
-    const hash: string = cryptoLib.pbkdf2Sync(key, salt, 100000, 64, 'sha512').toString('hex');
+    const salt: string = crypto.randomBytes(16).toString('hex');
+    const hash: string = crypto.pbkdf2Sync(key, salt, 100000, 64, 'sha512').toString('hex');
     return { salt, hash };
 }
 
 function verifyKey(sentKey: string | undefined, storedKey: string, salt: string) {
-    const hash = cryptoLib.pbkdf2Sync(sentKey, salt, 100000, 64, 'sha512').toString('hex');
+    const hash = crypto.pbkdf2Sync((sentKey as string), salt, 100000, 64, 'sha512').toString('hex');
     return hash === storedKey;
 }
 

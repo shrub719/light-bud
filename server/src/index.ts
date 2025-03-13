@@ -5,6 +5,7 @@ declare module "express" {
 }
 
 import express, { Express, Request, Response } from "express";
+import { Document } from "mongodb";
 require("express-async-errors");
 
 const connectDB = require("./utils/db");
@@ -24,7 +25,7 @@ app.use(express.json());
 app.use("/api/users", userRoutes);
 app.use("/api/rooms", roomRoutes);
 
-app.get("/test", (req: Request, res: Response) => {
+app.get("/test", (req, res) => {
     const name = req.query.name;
     res.json({ message: `hi from the server, ${name}!!` });
 });
