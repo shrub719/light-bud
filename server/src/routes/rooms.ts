@@ -1,8 +1,8 @@
 import express, { Router, Request, Response } from "express";
 import { Document } from "mongodb";
-const User = require("../utils/models/User")
-const Room = require("../utils/models/Room");
-const auth = require("../utils/auth");
+import User from "../utils/models/User";
+import Room from "../utils/models/Room";
+import * as auth from "../utils/auth";
 
 require("dotenv").config();
 const router: Router = express.Router();
@@ -11,7 +11,7 @@ const router: Router = express.Router();
 // TODO: extract strings so you can change them more easily
 const MAX_MEMBERS = 8
 async function handleRoom(req: Request, res: Response, update: object): Promise<any> {
-    const room: Document = await Room.findOne({ code: req.body.code });
+    const room = await Room.findOne({ code: req.body.code });
     if (!room) return res.status(400).json({ error: "A room with that code does not exist!" });
     if (room.members.length >= MAX_MEMBERS) return res.status(400).json({ error: "Sorry, that room is full!" });
 
@@ -56,4 +56,4 @@ router.post("/create", async (req, res) => {
 router.put("/join", async (req, res) => handleRoom(req, res, { $addToSet: { members: req.body.uuid } }));
 router.put("/leave", async (req, res) => handleRoom(req, res, { $pull: { members: req.body.uuid } }));
 
-module.exports = router; 
+export default router;

@@ -6,13 +6,14 @@ declare module "express" {
 
 import express, { Express, Request, Response } from "express";
 import { Document } from "mongodb";
-require("express-async-errors");
+import "express-async-errors";
+import dotenv from "dotenv";
+dotenv.config();
 
-const connectDB = require("./utils/db");
-const userRoutes = require("./routes/users");
-const roomRoutes = require("./routes/rooms");
+import connectDB from "./utils/db";
+import userRoutes from "./routes/users";
+import roomRoutes from "./routes/rooms";
 
-require("dotenv").config();
 const PORT = process.env.PORT || 3001;
 const app: Express = express();
 connectDB();

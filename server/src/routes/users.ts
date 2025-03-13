@@ -1,14 +1,9 @@
 import express, { Router, Request } from "express";
 import { Document } from "mongodb";
-const User = require("../utils/models/User");
-const Room = require("../utils/models/Room");
-const auth = require("../utils/auth");
-const {
-	RegExpMatcher,
-	TextCensor,
-	englishDataset,
-	englishRecommendedTransformers,
-} = require("obscenity");
+import User from "../utils/models/User";
+import Room from "../utils/models/Room";
+import * as auth from "../utils/auth";
+import { RegExpMatcher, TextCensor, englishDataset, englishRecommendedTransformers } from "obscenity";
 
 require("dotenv").config();
 const router: Router = express.Router();
@@ -45,7 +40,7 @@ router.get("/members", async (req, res): Promise<any> => {
 
 router.get("/", async (req, res) => {
     if (auth.getKey(req) === process.env.PASSWORD) {
-        const users = await User.find();
+        const users = await User.find() as Document;
         const strippedUsers = users.map(auth.stripAuth);
         res.status(200).json(strippedUsers);
     } else {
@@ -56,7 +51,7 @@ router.get("/", async (req, res) => {
 router.use(auth.authenticate);
 
 router.get("/user", async (req: Request, res) => {
-    const user = req.user;
+    const user = req.user as Document;
     res.status(200).json(auth.stripAuth(user));
 });
 
@@ -95,11 +90,11 @@ router.post("/buy", async (req: Request, res): Promise<any> => {
             { _id: user._id },
             { $addToSet: { "shop.unlocked": req.body.item } },
             { new: true }
-        );
+        ) as Document;
         res.status(200).json({ result: result, user: auth.stripAuth(updatedUser) });
     } else {
         res.status(500).json({ result: result });
     }
 });
 
-module.exports = router; 
+export default router;
