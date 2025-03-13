@@ -6,6 +6,7 @@ export const limit = rateLimit({
     max: 5
 });
 
+// TODO: test delay values
 export const slow = slowDown({
     windowMs: 10 * 60 * 1000,
     delayAfter: 10,

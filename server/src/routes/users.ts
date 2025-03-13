@@ -1,6 +1,7 @@
 import express, { Router, Request } from "express";
 import { Document } from "mongodb";
 import User from "../utils/models/User";
+import { limit, slow } from "../utils/limiters";
 import * as auth from "../utils/auth";
 import { RegExpMatcher, englishDataset, englishRecommendedTransformers } from "obscenity";
 
@@ -14,7 +15,7 @@ const matcher = new RegExpMatcher({
 
 
 // TODO: what if a uuid ever clashes?
-router.post("/register", async (req, res) => {
+router.post("/register", limit, async (req, res) => {
     const uuid = auth.generateRandom();
     const key = auth.generateRandom();
     const { salt, hash } = auth.hashKey(key);
@@ -29,7 +30,7 @@ router.post("/register", async (req, res) => {
     res.status(201).json({ user: auth.stripAuth(savedUser), unhashedKey: key }).status(201);
 });
 
-router.get("/users", async (req, res) => {
+router.get("/users", slow, async (req, res) => {
     if (auth.getKey(req) === process.env.PASSWORD) {
         const users = await User.find() as Document;
         const strippedUsers = users.map(auth.stripAuth);
@@ -41,12 +42,12 @@ router.get("/users", async (req, res) => {
 
 router.use(auth.authenticate);
 
-router.get("/user", async (req: Request, res) => {
+router.get("/user", slow, async (req: Request, res) => {
     const user = req.user as Document;
     res.status(200).json(auth.stripAuth(user));
 });
 
-router.put("/user", async (req: Request, res): Promise<any> => {
+router.put("/user", slow, async (req: Request, res): Promise<any> => {
     const user: any = req.user;
     if (req.body.stats) user.stats = req.body.stats;
     if (req.body.profile) {
@@ -67,7 +68,7 @@ router.put("/user", async (req: Request, res): Promise<any> => {
     res.status(200).json(auth.stripAuth(savedUser));
 });
 
-router.post("/buy", async (req: Request, res): Promise<any> => {
+router.post("/buy", slow, async (req: Request, res): Promise<any> => {
     // NOTE: req.body.item is the item to unlock
     //       remember to change result logic
     const user: any = req.user;
