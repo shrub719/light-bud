@@ -45,7 +45,9 @@ export function checkKey(req: Request, user: Document) {
 }
 
 export async function authenticate(req: Request, res: Response, next: () => void): Promise<any> {
-    const user = await User.findOne({ uuid: req.body.uuid });
+    let uuid = req.body.uuid;
+    if (!uuid) uuid = req.query.uuid;
+    const user = await User.findOne({ uuid: uuid });
     if (!user) return res.status(400).send();
     if (checkKey(req, user)) {
         req.user = user;
