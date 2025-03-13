@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 require("express-async-errors");
-const connectDB = require("./db/db");
+const connectDB = require("./utils/db");
 const userRoutes = require("./routes/users");
 const roomRoutes = require("./routes/rooms");
 require("dotenv").config();
@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 3001;
 const app = (0, express_1.default)();
 connectDB();
 app.use(express_1.default.json());
-// routes jrfgkh
+// routes
 // TODO: should user data and user auth stuff be stored in separate collections?
 // TODO: express-validator
 app.use("/api/users", userRoutes);

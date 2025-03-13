@@ -1,7 +1,7 @@
 import express, { Express, Request, Response } from "express";
 require("express-async-errors");
 
-const connectDB = require("./db/db");
+const connectDB = require("./utils/db");
 const userRoutes = require("./routes/users");
 const roomRoutes = require("./routes/rooms");
 
@@ -12,7 +12,7 @@ connectDB();
 
 app.use(express.json());
 
-// routes jrfgkh
+// routes
 // TODO: should user data and user auth stuff be stored in separate collections?
 // TODO: express-validator
 app.use("/api/users", userRoutes);
