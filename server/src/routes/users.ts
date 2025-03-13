@@ -3,7 +3,7 @@ import { Document } from "mongodb";
 import User from "../utils/models/User";
 import Room from "../utils/models/Room";
 import * as auth from "../utils/auth";
-import { RegExpMatcher, TextCensor, englishDataset, englishRecommendedTransformers } from "obscenity";
+import { RegExpMatcher, englishDataset, englishRecommendedTransformers } from "obscenity";
 
 require("dotenv").config();
 const router: Router = express.Router();
