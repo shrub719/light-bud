@@ -6,7 +6,7 @@ The extension is a React app written in TypeScript transpiled with [WXT](https:/
 
 ### Setup
 
-1. In the `extension` directory, run:
+1. In the `./extension` directory, run:
     ```
     npm install
     ```

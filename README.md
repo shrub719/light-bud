@@ -4,7 +4,9 @@ This rewrite is currently in progress, see the legacy version [here](https://git
 
 ## How to Contribute
 
-Fork and clone this repository to start working.  
+Fork and clone this repository to start working.
+
 ### Contribution Instructions and Documentation
+
 - [Server](server/README.md)
 - [Extension](extension/README.md)
