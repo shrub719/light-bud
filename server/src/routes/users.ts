@@ -1,7 +1,6 @@
 import express, { Router, Request } from "express";
 import { Document } from "mongodb";
 import User from "../utils/models/User";
-import Room from "../utils/models/Room";
 import * as auth from "../utils/auth";
 import { RegExpMatcher, englishDataset, englishRecommendedTransformers } from "obscenity";
 
@@ -15,7 +14,7 @@ const matcher = new RegExpMatcher({
 
 
 // TODO: what if a uuid ever clashes?
-router.post("/create", async (req, res) => {
+router.post("/register", async (req, res) => {
     const uuid = auth.generateRandom();
     const key = auth.generateRandom();
     const { salt, hash } = auth.hashKey(key);
@@ -30,15 +29,7 @@ router.post("/create", async (req, res) => {
     res.status(201).json({ user: auth.stripAuth(savedUser), unhashedKey: key }).status(201);
 });
 
-router.get("/members", async (req, res): Promise<any> => {
-    const room = await Room.findOne({ code: req.query.code });
-    if (!room) return res.status(400).send();
-    const users = await User.find({ uuid: { $in: room.uuids } });
-    const strippedUsers = users.map((user: Document) => auth.stripAuth(user, true));
-    res.status(200).json(strippedUsers);
-})
-
-router.get("/", async (req, res) => {
+router.get("/users", async (req, res) => {
     if (auth.getKey(req) === process.env.PASSWORD) {
         const users = await User.find() as Document;
         const strippedUsers = users.map(auth.stripAuth);

@@ -23,8 +23,8 @@ app.use(express.json());
 // routes
 // TODO: should user data and user auth stuff be stored in separate collections?
 // TODO: express-validator
-app.use("/api/users", userRoutes);
-app.use("/api/rooms", roomRoutes);
+app.use("/api", userRoutes);
+app.use("/api", roomRoutes);
 
 app.get("/test", (req, res) => {
     const name = req.query.name;

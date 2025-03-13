@@ -1,4 +1,6 @@
 import express, { Router, Request, Response } from "express";
+import { Document } from "mongodb";
+import User from "../utils/models/User"
 import Room from "../utils/models/Room";
 import * as auth from "../utils/auth";
 
@@ -31,6 +33,14 @@ router.get("/room", async (req, res): Promise<any> => {
     res.status(200).json(room);
 });
 
+router.get("/room_members", async (req, res): Promise<any> => {
+    const room = await Room.findOne({ code: req.query.code });
+    if (!room) return res.status(400).send();
+    const users = await User.find({ uuid: { $in: room.uuids } });
+    const strippedUsers = users.map((user: Document) => auth.stripAuth(user, true));
+    res.status(200).json(strippedUsers);
+})
+
 router.get("/", async (req, res) => {
     if (auth.getKey(req) === process.env.PASSWORD) {
         const rooms = await Room.find();
@@ -42,7 +52,7 @@ router.get("/", async (req, res) => {
 
 router.use(auth.authenticate);
 
-router.post("/create", async (req, res) => {
+router.post("/room", async (req, res) => {
     const room = new Room( {
         code: auth.generateRandom(),
         members: [req.body.uuid]
