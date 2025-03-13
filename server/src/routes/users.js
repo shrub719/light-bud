@@ -1,7 +1,7 @@
 const express = require("express");
-const User = require("../db/models/User");
-const Room = require("../db/models/Room");
-const auth = require("../db/auth");
+const User = require("../utils/models/User");
+const Room = require("../utils/models/Room");
+const auth = require("../utils/auth");
 const {
 	RegExpMatcher,
 	TextCensor,
