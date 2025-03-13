@@ -1,6 +1,4 @@
 import express, { Router, Request, Response } from "express";
-import { Document } from "mongodb";
-import User from "../utils/models/User";
 import Room from "../utils/models/Room";
 import * as auth from "../utils/auth";
 
