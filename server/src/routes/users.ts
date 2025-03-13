@@ -33,7 +33,7 @@ router.post("/create", async (req, res) => {
 router.get("/members", async (req, res): Promise<any> => {
     const room = await Room.findOne({ code: req.query.code });
     if (!room) return res.status(400).send();
-    const users = await User.find({ uuid: { $in: room.members } });
+    const users = await User.find({ uuid: { $in: room.uuids } });
     const strippedUsers = users.map((user: Document) => auth.stripAuth(user, true));
     res.status(200).json(strippedUsers);
 })

@@ -13,7 +13,7 @@ const MAX_MEMBERS = 8
 async function handleRoom(req: Request, res: Response, update: object): Promise<any> {
     const room = await Room.findOne({ code: req.body.code });
     if (!room) return res.status(400).json({ error: "A room with that code does not exist!" });
-    if (room.members.length >= MAX_MEMBERS) return res.status(400).json({ error: "Sorry, that room is full!" });
+    if (room.uuids.length >= MAX_MEMBERS) return res.status(400).json({ error: "Sorry, that room is full!" });
 
     const updatedRoom = await Room.findByIdAndUpdate(
         { _id: room._id },
@@ -22,7 +22,7 @@ async function handleRoom(req: Request, res: Response, update: object): Promise<
     );
 
     if (!updatedRoom) return res.status(400).json({ error: "A room with that code does not exist!" });
-    if (updatedRoom.members.length === 0) await updatedRoom.deleteOne();
+    if (updatedRoom.uuids.length === 0) await updatedRoom.deleteOne();
     res.status(200).json(updatedRoom);
 }
 
