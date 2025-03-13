@@ -12,7 +12,7 @@ connectDB();
 
 app.use(express.json());
 
-// routes
+// routes jrfgkh
 // TODO: should user data and user auth stuff be stored in separate collections?
 // TODO: express-validator
 app.use("/api/users", userRoutes);
