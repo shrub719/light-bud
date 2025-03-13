@@ -1,26 +1,28 @@
-const crypto = require("crypto");
+const cryptoLib = require("crypto");
 const User = require("./models/User");
+import { Document } from "mongodb";
+import { Request, Response } from "express";
 
 function generateRandom() {
-    return crypto.randomBytes(32).toString('hex');
+    return cryptoLib.randomBytes(32).toString('hex');
 }
 
-function hashKey(key) {
-    const salt = crypto.randomBytes(16).toString('hex');
-    const hash = crypto.pbkdf2Sync(key, salt, 100000, 64, 'sha512').toString('hex');
+function hashKey(key: string) {
+    const salt: string = cryptoLib.randomBytes(16).toString('hex');
+    const hash: string = cryptoLib.pbkdf2Sync(key, salt, 100000, 64, 'sha512').toString('hex');
     return { salt, hash };
 }
 
-function verifyKey(sentKey, storedKey, salt) {
-    const hash = crypto.pbkdf2Sync(sentKey, salt, 100000, 64, 'sha512').toString('hex');
+function verifyKey(sentKey: string | undefined, storedKey: string, salt: string) {
+    const hash = cryptoLib.pbkdf2Sync(sentKey, salt, 100000, 64, 'sha512').toString('hex');
     return hash === storedKey;
 }
 
-function stripAuth(user, public=false) {
+function stripAuth(user: Document, isPublic: boolean = false) {
     // public: true if data is available to any user
     const userObject = user.toObject();
-    let strippedUser = {};
-    if (public) {
+    let strippedUser: object = {};
+    if (isPublic) {
         const { auth, shop, ...strippedUserObject } = userObject;
         strippedUser = strippedUserObject;
     } else {
@@ -30,11 +32,11 @@ function stripAuth(user, public=false) {
     return strippedUser;
 }
 
-function getKey(req) {
-    return req.headers.authorisation.split(" ")[1];
+function getKey(req: Request) {
+    return req.headers.authorization?.split(" ")[1];
 }
 
-function checkKey(req, user) {
+function checkKey(req: Request, user: Document) {
     try {
         return verifyKey(getKey(req), user.auth.key, user.auth.salt);
     } catch (err) {
@@ -42,7 +44,7 @@ function checkKey(req, user) {
     }
 }
 
-async function authenticate(req, res, next) {
+async function authenticate(req: Request, res: Response, next: () => void) {
     const user = await User.findOne({ uuid: req.body.uuid });
     if (!user) return res.status(400).send();
     if (checkKey(req, user)) {
@@ -53,7 +55,7 @@ async function authenticate(req, res, next) {
     }
 }
 
-function validateUsername(username) {
+function validateUsername(username: string) {
     // allow only alphanumeric characters and underscores
     const regex = /^[a-zA-Z0-9_ ]+$/;
     return regex.test(username);

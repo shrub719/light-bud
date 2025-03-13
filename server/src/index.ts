@@ -1,3 +1,9 @@
+declare module "express" {
+    interface Request {
+        user?: Document;
+    }
+}
+
 import express, { Express, Request, Response } from "express";
 require("express-async-errors");
 
