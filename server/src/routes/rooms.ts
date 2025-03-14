@@ -10,7 +10,6 @@ require("dotenv").config();
 const router: Router = express.Router();
 
 
-// TODO: extract strings so you can change them more easily
 const MAX_MEMBERS = 8
 async function handleRoom(req: Request, res: Response, update: object): Promise<any> {
     const room = await Room.findOne({ code: req.body.code.toUppercase() });
@@ -36,9 +35,9 @@ router.get("/room", slow, async (req, res): Promise<any> => {
 });
 
 router.get("/room_members", slow, async (req, res): Promise<any> => {
-    const room = await Room.findOne({ code: req.query.code });
+    const room: Document | null = await Room.findOne({ code: req.query.code });
     if (!room) return res.status(400).send();
-    const users = await User.find({ uuid: { $in: room.uuids } });
+    const users = await User.find({ _id: { $in: room.uuids } });
     const strippedUsers = users.map((user: Document) => auth.stripAuth(user, true));
     res.status(200).json(strippedUsers);
 })
@@ -57,13 +56,13 @@ router.use(auth.authenticate);
 router.post("/room", slow, async (req, res) => {
     const room = new Room( {
         code: auth.generateRandom(16),
-        members: [req.body.uuid]
+        uuids: [req.body.uuid]
     });
     const savedRoom = await room.save();
     res.status(201).json(savedRoom);
 });
 
-router.put("/join", slow, async (req, res) => handleRoom(req, res, { $addToSet: { members: req.body.uuid } }));
-router.put("/leave", slow, async (req, res) => handleRoom(req, res, { $pull: { members: req.body.uuid } }));
+router.put("/join", slow, async (req, res) => handleRoom(req, res, { $addToSet: { uuids: req.body.uuid } }));
+router.put("/leave", slow, async (req, res) => handleRoom(req, res, { $pull: { uuids: req.body.uuid } }));
 
 export default router;

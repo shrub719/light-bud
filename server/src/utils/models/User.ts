@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
-    uuid: { type: String, required: true, unique: true },
     auth: {
         key: { type: String, required: true },
         salt: { type: String, required: true },

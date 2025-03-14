@@ -13,14 +13,10 @@ const matcher = new RegExpMatcher({
 });
 
 
-
-// TODO: what if a uuid ever clashes?
 router.post("/register", limit, async (req, res) => {
-    const uuid = auth.generateRandom();
     const key = auth.generateRandom();
     const { salt, hash } = auth.hashKey(key);
     const user = new User({ 
-        uuid: uuid,
         auth: {
             key: hash,
             salt: salt
