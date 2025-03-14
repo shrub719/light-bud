@@ -1,5 +1,6 @@
 import crypto from "crypto";
 import User from "./models/User";
+import Room from "./models/Room";
 import { Document } from "mongodb";
 import { Request, Response } from "express";
 
@@ -57,6 +58,13 @@ export async function auth(req: Request, res: Response, next: () => void): Promi
     } else {
         res.status(403).send();
     }
+}
+
+export async function accessRoom(req: Request, res: Response): Promise<any> {
+    const room = await Room.findOne({ code: req.body.code });
+    if (!room) return res.status(400).json();
+    if (!room.uuids.includes(req?.user?._id)) return res.status(403).json();
+    return room;
 }
 
 export function validateUsername(username: string) {

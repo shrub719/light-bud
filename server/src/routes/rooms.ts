@@ -42,9 +42,11 @@ router.get("/room", slow, async (req, res): Promise<any> => {
     res.status(200).json(room);
 });
 
-router.get("/members", slow, async (req, res): Promise<any> => {
-    const room: Document | null = await Room.findOne({ code: req.query.code });
-    if (!room) return res.status(400).send();
+// TODO: always just crashes if there's no such user
+router.put("/members", slow, auth.auth, async (req, res): Promise<any> => {
+    // const room: Document | null = await Room.findOne({ code: req.query.code });
+    // if (!room) return res.status(400).send();
+    const room = await auth.accessRoom(req, res);
     const users = await User.find({ _id: { $in: room.uuids } });
     const strippedUsers = users.map((user: Document) => auth.stripAuth(user, true));
     res.status(200).json(strippedUsers);
