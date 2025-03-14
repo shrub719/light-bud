@@ -76,10 +76,10 @@ router.post("/create", slow, auth.authenticate, async (req, res) => {
 router.put("/join", auth.authenticate, slow, async (req, res) => handleRoom(req, res, 
     { $addToSet: { uuids: req.body.uuid } },
     { $addToSet: { rooms: req.body.code } }
-    ));
+));
 router.put("/leave", auth.authenticate, slow, async (req, res) => handleRoom(req, res, 
     { $pull: { uuids: req.body.uuid } },
     { $pull: { rooms: req.body.code } }
-    ));
+));
 
 export default router;
