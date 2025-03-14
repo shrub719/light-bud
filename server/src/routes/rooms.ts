@@ -2,7 +2,7 @@ import express, { Router, Request, Response } from "express";
 import { Document } from "mongodb";
 import User from "../utils/models/User"
 import Room from "../utils/models/Room";
-import { slow } from "../utils/limiters";
+import { limit, slow } from "../utils/limiters";
 import * as auth from "../utils/auth";
 
 require("dotenv").config();
@@ -59,7 +59,7 @@ router.get("/", slow, async (req, res) => {
     }
 });
 
-router.post("/create", slow, auth.auth, async (req, res) => {
+router.post("/create", limit, auth.auth, async (req, res) => {
     const room = new Room( {
         code: auth.generateRandom(16),
         uuids: [req.body.uuid]
@@ -73,11 +73,11 @@ router.post("/create", slow, auth.auth, async (req, res) => {
     res.status(201).json({ room: savedRoom, user: updatedUser });
 });
 
-router.put("/join", auth.auth, slow, async (req, res) => handleRoom(req, res, 
+router.put("/join", slow, auth.auth, async (req, res) => handleRoom(req, res, 
     { $addToSet: { uuids: req.body.uuid } },
     { $addToSet: { rooms: req.body.code } }
 ));
-router.put("/leave", auth.auth, slow, async (req, res) => handleRoom(req, res, 
+router.put("/leave", slow, auth.auth, async (req, res) => handleRoom(req, res, 
     { $pull: { uuids: req.body.uuid } },
     { $pull: { rooms: req.body.code } }
 ));
