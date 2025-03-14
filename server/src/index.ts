@@ -13,6 +13,7 @@ dotenv.config();
 import connectDB from "./utils/db";
 import userRoutes from "./routes/users";
 import roomRoutes from "./routes/rooms";
+import sessionRoutes from "./routes/sessions"
 
 const PORT = process.env.PORT || 3001;
 const app: Express = express();
@@ -22,6 +23,7 @@ app.use(express.json());
 
 app.use("/api/u", userRoutes);
 app.use("/api/r", roomRoutes);
+app.use("/api/s", sessionRoutes);
 
 app.get("/test", (req, res) => {
     const name = req.query.name;
