@@ -12,6 +12,7 @@ const userSchema = new mongoose.Schema({
         username: { type: String, default: "Light Bud User" },
         icon: { type: [String], default: ["cat-happy", "blue"] } 
     },
+    rooms: { type: [String], default: [] },
     shop: {
         unlocked: { type: [String], default: [] }
     }
