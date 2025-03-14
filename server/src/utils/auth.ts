@@ -63,7 +63,7 @@ export async function auth(req: Request, res: Response, next: () => void): Promi
 
 export async function accessRoom(req: Request, res: Response): Promise<any> {
     const room = await Room.findOne({ code: req.body.code });
-    if (!room) return res.status(400).json();
+    if (!room) return res.status(400).send();
     if (!room.uuids.includes(req?.user?._id)) return res.status(403).json();
     return room;
 }
