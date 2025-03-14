@@ -31,6 +31,7 @@ async function handleRoom(req: Request, res: Response, roomUpdate: object, userU
     // also req.user exists, maybe use that?
 
     if (!updatedRoom) return res.status(400).json({ error: "room-none" });
+    if (updatedRoom === room) return res.status(400).json({ error: "room-in"} )
     if (updatedRoom.uuids.length === 0) await updatedRoom.deleteOne();
     res.status(200).json({ room: updatedRoom, user: auth.stripAuth(updatedUser as Document) });
 }
