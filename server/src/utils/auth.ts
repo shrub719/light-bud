@@ -20,7 +20,7 @@ function verifyKey(sentKey: string | undefined, storedKey: string, salt: string)
 
 export function stripAuth(user: Document, isPublic: boolean = false) {
     // public: true if data is available to any user
-    const userObject = user?.toObject();
+    const userObject = user.toObject();
     let strippedUser: object = {};
     if (isPublic) {
         const { auth, shop, ...strippedUserObject } = userObject;
@@ -33,7 +33,7 @@ export function stripAuth(user: Document, isPublic: boolean = false) {
 }
 
 export function getKey(req: Request) {
-    return req.headers.authorization?.split(" ")[1];
+    return (req.headers.authorization as string).split(" ")[1];
 }
 
 export function checkKey(req: Request, user: Document) {
