@@ -21,6 +21,8 @@ async function handleRoom(req: Request, res: Response, update: object): Promise<
         update,
         { new: true }
     );
+    // const updatedRoom = await room.update(update);
+    // TODO: test
 
     if (!updatedRoom) return res.status(400).json({ error: "room-none" });
     if (updatedRoom.uuids.length === 0) await updatedRoom.deleteOne();
