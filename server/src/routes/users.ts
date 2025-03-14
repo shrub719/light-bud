@@ -26,7 +26,7 @@ router.post("/register", limit, async (req, res) => {
     res.status(201).json({ user: auth.stripAuth(savedUser), unhashedKey: key }).status(201);
 });
 
-router.get("/users", slow, async (req, res) => {
+router.get("/", slow, async (req, res) => {
     if (auth.getKey(req) === process.env.PASSWORD) {
         const users = await User.find() as Document;
         const strippedUsers = users.map(auth.stripAuth);

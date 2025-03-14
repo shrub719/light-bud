@@ -42,7 +42,7 @@ router.get("/room", slow, async (req, res): Promise<any> => {
     res.status(200).json(room);
 });
 
-router.get("/room_members", slow, async (req, res): Promise<any> => {
+router.get("/members", slow, async (req, res): Promise<any> => {
     const room: Document | null = await Room.findOne({ code: req.query.code });
     if (!room) return res.status(400).send();
     const users = await User.find({ _id: { $in: room.uuids } });
@@ -59,7 +59,7 @@ router.get("/", slow, async (req, res) => {
     }
 });
 
-router.post("/room", slow, auth.authenticate, async (req, res) => {
+router.post("/create", slow, auth.authenticate, async (req, res) => {
     const room = new Room( {
         code: auth.generateRandom(16),
         uuids: [req.body.uuid]

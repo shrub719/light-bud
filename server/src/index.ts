@@ -20,8 +20,8 @@ connectDB();
 
 app.use(express.json());
 
-app.use("/api", userRoutes);
-app.use("/api", roomRoutes);
+app.use("/api/u", userRoutes);
+app.use("/api/r", roomRoutes);
 
 app.get("/test", (req, res) => {
     const name = req.query.name;
