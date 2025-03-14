@@ -45,7 +45,7 @@ export function checkKey(req: Request, user: Document) {
 }
 
 export async function authenticate(req: Request, res: Response, next: () => void): Promise<any> {
-    console.log("auth says hi!")
+    console.log("auth triggered")
     let uuid = req.body.uuid;
     if (!uuid) uuid = req.query.uuid;
     if (!uuid) return res.status(400).send();
