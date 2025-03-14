@@ -1,7 +1,7 @@
 import crypto from "crypto";
 import User from "./models/User";
 import Room from "./models/Room";
-import { Document } from "mongodb";
+import { ObjectId, Document } from "mongodb";
 import { Request, Response } from "express";
 
 export function generateRandom(length: number = 32) {
@@ -50,6 +50,7 @@ export async function auth(req: Request, res: Response, next: () => void): Promi
     let uuid = req.body.uuid;
     if (!uuid) uuid = req.query.uuid;
     if (!uuid) return res.status(400).send();
+    if (!ObjectId.isValid(uuid)) return res.status(400).send();
     const user = await User.findById({ _id: uuid });
     if (!user) return res.status(400).send();
     if (checkKey(req, user)) {
