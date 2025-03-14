@@ -36,14 +36,12 @@ router.get("/users", slow, async (req, res) => {
     }
 });
 
-router.use(auth.authenticate);
-
-router.get("/user", slow, async (req: Request, res) => {
+router.get("/user", slow, auth.authenticate, async (req: Request, res) => {
     const user = req.user as Document;
     res.status(200).json(auth.stripAuth(user));
 });
 
-router.put("/user", slow, async (req: Request, res): Promise<any> => {
+router.put("/user", slow, auth.authenticate, async (req: Request, res): Promise<any> => {
     const user: any = req.user;
     if (req.body.stats) user.stats = req.body.stats;
     if (req.body.profile) {
@@ -64,7 +62,7 @@ router.put("/user", slow, async (req: Request, res): Promise<any> => {
     res.status(200).json(auth.stripAuth(savedUser));
 });
 
-router.post("/buy", slow, async (req: Request, res): Promise<any> => {
+router.post("/buy", slow, auth.authenticate, async (req: Request, res): Promise<any> => {
     // NOTE: req.body.item is the item to unlock
     //       remember to change result logic
     const user: any = req.user;

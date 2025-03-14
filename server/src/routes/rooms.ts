@@ -4,7 +4,6 @@ import User from "../utils/models/User"
 import Room from "../utils/models/Room";
 import { slow } from "../utils/limiters";
 import * as auth from "../utils/auth";
-import * as crypto from "crypto";
 
 require("dotenv").config();
 const router: Router = express.Router();
@@ -60,22 +59,25 @@ router.get("/", slow, async (req, res) => {
     }
 });
 
-router.use(auth.authenticate);
-
-router.post("/room", slow, async (req, res) => {
+router.post("/room", slow, auth.authenticate, async (req, res) => {
     const room = new Room( {
         code: auth.generateRandom(16),
         uuids: [req.body.uuid]
     });
     const savedRoom = await room.save();
-    res.status(201).json(savedRoom);
+    const updatedUser = await User.findByIdAndUpdate(
+        { _id: req.body.uuid },
+        { $addToSet: { rooms: req.body.code } },
+        { new: true }
+    );
+    res.status(201).json({ room: savedRoom, user: updatedUser });
 });
 
-router.put("/join", slow, async (req, res) => handleRoom(req, res, 
+router.put("/join", auth.authenticate, slow, async (req, res) => handleRoom(req, res, 
     { $addToSet: { uuids: req.body.uuid } },
     { $addToSet: { rooms: req.body.code } }
     ));
-router.put("/leave", slow, async (req, res) => handleRoom(req, res, 
+router.put("/leave", auth.authenticate, slow, async (req, res) => handleRoom(req, res, 
     { $pull: { uuids: req.body.uuid } },
     { $pull: { rooms: req.body.code } }
     ));
