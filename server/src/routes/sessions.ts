@@ -9,9 +9,19 @@ require("dotenv").config();
 const router: Router = express.Router();
 
 
-router.post("/start", slow, auth.auth, async (req, res): Promise<any> => {
-    
-});
+// TODO: add validation, like can't be in/hosting a room at the same time
+router.post("/start", slow, auth.auth, async (req: Request, res): Promise<any> => {
+    const room = await auth.accessRoom(req, res);
+    const uuid: string = req.body.uuid;
+    room.sessions.push({
+        host: uuid,
+        uuids: [uuid],
+        startTime: 3,  // TODO: use datetime or something
+        duration: req.body.duration
+    });
+    const savedRoom = await room.save();
+    res.status(200).json(savedRoom);
+}); 
 
 router.get("/session", slow, auth.auth, async (req, res): Promise<any> => {
     const room = await Room.findOne({ code: req.query.code });
