@@ -11,22 +11,28 @@ const router: Router = express.Router();
 
 
 const MAX_MEMBERS = 8
-async function handleRoom(req: Request, res: Response, update: object): Promise<any> {
-    const room = await Room.findOne({ code: req.body.code.toUppercase() });
+async function handleRoom(req: Request, res: Response, roomUpdate: object, userUpdate: object): Promise<any> {
+    const room = await Room.findOne({ code: req.body.code });
     if (!room) return res.status(400).json({ error: "room-none" });
     if (room.uuids.length >= MAX_MEMBERS) return res.status(400).json({ error: "room-full" });
 
     const updatedRoom = await Room.findByIdAndUpdate(
         { _id: room._id },
-        update,
+        roomUpdate,
+        { new: true }
+    );
+    const updatedUser = await User.findByIdAndUpdate(
+        { _id: req.body.uuid },
+        userUpdate,
         { new: true }
     );
     // const updatedRoom = await room.update(update);
     // TODO: test
+    // also req.user exists, maybe use that?
 
     if (!updatedRoom) return res.status(400).json({ error: "room-none" });
     if (updatedRoom.uuids.length === 0) await updatedRoom.deleteOne();
-    res.status(200).json(updatedRoom);
+    res.status(200).json({ room: updatedRoom, user: auth.stripAuth(updatedUser as Document) });
 }
 
 
@@ -64,7 +70,13 @@ router.post("/room", slow, async (req, res) => {
     res.status(201).json(savedRoom);
 });
 
-router.put("/join", slow, async (req, res) => handleRoom(req, res, { $addToSet: { uuids: req.body.uuid } }));
-router.put("/leave", slow, async (req, res) => handleRoom(req, res, { $pull: { uuids: req.body.uuid } }));
+router.put("/join", slow, async (req, res) => handleRoom(req, res, 
+    { $addToSet: { uuids: req.body.uuid } },
+    { $addToSet: { rooms: req.body.code } }
+    ));
+router.put("/leave", slow, async (req, res) => handleRoom(req, res, 
+    { $pull: { uuids: req.body.uuid } },
+    { $pull: { rooms: req.body.code } }
+    ));
 
 export default router;
