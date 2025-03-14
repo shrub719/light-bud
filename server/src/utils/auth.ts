@@ -3,8 +3,8 @@ import User from "./models/User";
 import { Document } from "mongodb";
 import { Request, Response } from "express";
 
-export function generateRandom() {
-    return crypto.randomBytes(32).toString('hex');
+export function generateRandom(length: number = 32) {
+    return crypto.randomBytes(length).toString('hex');
 }
 
 export function hashKey(key: string) {

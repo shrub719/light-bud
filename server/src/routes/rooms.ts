@@ -4,6 +4,7 @@ import User from "../utils/models/User"
 import Room from "../utils/models/Room";
 import { slow } from "../utils/limiters";
 import * as auth from "../utils/auth";
+import * as crypto from "crypto";
 
 require("dotenv").config();
 const router: Router = express.Router();
@@ -12,7 +13,7 @@ const router: Router = express.Router();
 // TODO: extract strings so you can change them more easily
 const MAX_MEMBERS = 8
 async function handleRoom(req: Request, res: Response, update: object): Promise<any> {
-    const room = await Room.findOne({ code: req.body.code });
+    const room = await Room.findOne({ code: req.body.code.toUppercase() });
     if (!room) return res.status(400).json({ error: "room-none" });
     if (room.uuids.length >= MAX_MEMBERS) return res.status(400).json({ error: "room-full" });
 
@@ -55,7 +56,7 @@ router.use(auth.authenticate);
 
 router.post("/room", slow, async (req, res) => {
     const room = new Room( {
-        code: auth.generateRandom(),
+        code: auth.generateRandom(16),
         members: [req.body.uuid]
     });
     const savedRoom = await room.save();
