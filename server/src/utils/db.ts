@@ -35,16 +35,13 @@ export async function registerUser(req: Request) {
 }
 
 // TODO: require credentials for websocket
-export async function getUser(uuid: string, isUser=false): Promise<[Document, Object]> {
+export async function getUser(uuid: string): Promise<Document | Object> {
     const user = await User.findById({ _id: uuid });
-    return [user as Document, auth.stripAuth(user as Document, !isUser)];
+    return user as Document;
 }
 
-// TODO: keep user document as a variable in a websocket?
-export async function editUser(uuid: string, edits: any) {
-    const [user, strippedUser] = await getUser(uuid, true);
-
-    if (edits.stats) user.stats = edits.stats;
+export async function editUser(user: Document, edits: any) {
+ if (edits.stats) user.stats = edits.stats;
     if (edits.profile) {
         const username = edits.profile.username;
         if (matcher.hasMatch(username)) {
@@ -59,26 +56,22 @@ export async function editUser(uuid: string, edits: any) {
         user.profile = edits.profile;
     }
 
-    const savedUser = await user.save();
-    return auth.stripAuth(savedUser);
+    await user.save();
+    return user;
 }
 
 
 // TODO: leave room if joining another one
-async function handleRoom(uuid: string, update: object) {
-    const updatedUser = await User.findByIdAndUpdate(
-        { _id: uuid },
-        update,
-        { new: true }
-    );
+async function handleRoom(user: Document, update: object) {
+    const updatedUser = await user.update(update, { new: true });
     return updatedUser;
 }
 
-export const joinRoom = async (uuid: string, code: string) => handleRoom(
-    uuid, 
+export const joinRoom = async (user: Document, code: string) => handleRoom(
+    user, 
     { $addToSet: { rooms: code } }
 );
-export const leaveRoom = async (uuid: string, code: string) => handleRoom(
-    uuid, 
+export const leaveRoom = async (user: Document, code: string) => handleRoom(
+    user, 
     { $pull: { rooms: code } }
 );
