@@ -64,16 +64,14 @@ export async function editUser(user: Document, edits: any) {
 
 
 // TODO: leave room if joining another one
-async function handleRoom(user: Document, update: object) {
-    const updatedUser = await user.update(update, { new: true });
-    return updatedUser;
+export async function joinRoom(user: Document, code: string) {
+    user.room = code;
+    await user.save();
+    return user;
 }
 
-export const joinRoom = async (user: Document, code: string) => handleRoom(
-    user, 
-    { $addToSet: { rooms: code } }
-);
-export const leaveRoom = async (user: Document, code: string) => handleRoom(
-    user, 
-    { $pull: { rooms: code } }
-);
+export async function leaveRoom(user: Document, code: string) {
+    user.room = "";
+    await user.save();
+    return user;
+}
