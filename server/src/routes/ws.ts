@@ -5,10 +5,14 @@ import * as auth from "../utils/auth";
 export default function setupWebSocket(ioInstance: Server) {
     ioInstance.on("connection", async (socket) => {
         console.log("user connected");
-
-        const { sentUuid, key } = socket.handshake.auth;
+        const { uuid: sentUuid, key } = socket.handshake.auth;
         const uuid = await auth.wsAuth(sentUuid, key) as string;
-        if (uuid == null) return socket.disconnect(true);
+        if (uuid == null) {
+            console.log("user disconnected: bad auth");
+            socket.disconnect(true);
+            return;
+        }
+        console.log("uuid:", uuid);
     
         let user = await db.getUser(uuid);
 
