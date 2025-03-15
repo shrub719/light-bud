@@ -51,7 +51,7 @@ function isAuthorised(req: Request, user: Document) {
 
 // auth function to get the authorised uuid of a new websocket connection
 export async function wsAuth(uuid: string | undefined, key: string) {
-    if (!uuid) return;
+    if (uuid == null) return;
     if (!ObjectId.isValid(uuid)) return;
     const user = await User.findById({ _id: uuid }) as Document;
     if (!user) return;
