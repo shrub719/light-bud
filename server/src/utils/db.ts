@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-import { User } from "../utils/models"
-import { Document } from "mongodb";
+import { User, Room } from "../utils/models"
+import { Document, ObjectId } from "mongodb";
 import { Request } from "express";
 import * as auth from "../utils/auth";
 import { RegExpMatcher, englishDataset, englishRecommendedTransformers } from "obscenity";
@@ -63,15 +63,39 @@ export async function editUser(user: Document, edits: any) {
 }
 
 
-// TODO: leave room if joining another one
-export async function joinRoom(user: Document, code: string) {
-    user.room = code;
+export async function getRoom(code: string) {
+    const room = Room.findById(code);
+    if (!room) return { error: "room-none" };
+    return room;
+}
+
+export async function createRoom() {
+    const room = new Room();
+    await room.save();
+    return room;
+}
+
+export async function joinRoom(user: Document, code: ObjectId) {
+    user.room = code.toString();
     await user.save();
+
+    const room = await Room.findByIdAndUpdate(code, 
+        { $addToSet: { uuids: user.uuid } },
+        { new: true }
+    );
+    console.log(room);
+
     return user;
 }
 
-export async function leaveRoom(user: Document, code: string) {
+export async function leaveRoom(user: Document, code: ObjectId) {
     user.room = "";
     await user.save();
+
+    const room = await Room.findByIdAndUpdate(code, 
+        { $pull: { uuids: user.uuid } },
+        { new: true }
+    );
+
     return user;
 }

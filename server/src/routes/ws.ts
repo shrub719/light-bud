@@ -2,11 +2,11 @@ import { Server } from "socket.io";
 import * as db from "../utils/db";
 import * as auth from "../utils/auth";
 
-function room(code: string) {
+function toRoom(code: string) {
     return "room-" + code;
 }
 
-function session(roomCode: string, sessionCode: string) {
+function toSession(roomCode: string, sessionCode: string) {
     return "session-" + roomCode + "-" + sessionCode;
 }
 
@@ -26,8 +26,8 @@ export default function setupWebSocket(ioInstance: Server) {
 
         // user
         socket.on("edit", async edits => {
-            user = await db.editUser(user, edits);
-            socket.emit("edit-response", auth.stripAuth(user));
+            const result = await db.editUser(user, edits);
+            if (!result.error) user = result;
         });
 
         socket.on("get", async () => {
@@ -36,14 +36,14 @@ export default function setupWebSocket(ioInstance: Server) {
 
         // room
         if (user.room) {
-            socket.join(room(user.room));
-            socket.to(room(user.room)).emit("join-room");
+            socket.join(toRoom(user.room));
+            socket.to(toRoom(user.room)).emit("join-room");
         }
 
         socket.on("create-room", async () => {
-            const code = auth.generateRandom(16);
-            user = await db.joinRoom(user, code);
-            socket.join(room(code));
+            const room = await db.createRoom();
+            user = await db.joinRoom(user, room._id);
+            socket.join(toRoom(room._id.toString()));
         })
 
         socket.on("join-room", async code => {
@@ -58,14 +58,14 @@ export default function setupWebSocket(ioInstance: Server) {
             }
 
             user = await db.joinRoom(user, code);
-            socket.join(room(code));
-            socket.to(room(code)).emit("resend-sessions");  // signal to resend active sessions
+            socket.join(toRoom(code));
+            socket.to(toRoom(code)).emit("resend-sessions");  // signal to resend active sessions
         });
 
         socket.on("leave-room", async code => {
             if (!auth.validateRoomCode(code)) return;
             user = await db.leaveRoom(user, code);
-            socket.leave(room(code));
+            socket.leave(toRoom(code));
         });
 
 
