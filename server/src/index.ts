@@ -4,32 +4,42 @@ declare module "express" {
     }
 }
 
-import express, { Express, Request, Response } from "express";
+import express from "express";
 import { Document } from "mongodb";
 import "express-async-errors";
 import dotenv from "dotenv";
 dotenv.config();
 
 import connectDB from "./utils/db";
-import userRoutes from "./routes/users";
-import roomRoutes from "./routes/rooms";
-import sessionRoutes from "./routes/sessions"
+import http from "http";
+import cors from "cors";
+import { Server } from "socket.io";
+import setupWebSocket from "./routes/ws";
+import httpRouter from "./routes/http";
 
-const PORT = process.env.PORT || 3001;
-const app: Express = express();
+const PORT = process.env.PORT || "3002";
+const app = express();
+const config = {
+    origin: "*",  // FIXME !!!
+    methods: ["GET", "POST", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"]
+};
 connectDB();
 
+app.use(cors(config));
 app.use(express.json());
 
-app.use("/api/u", userRoutes);
-app.use("/api/r", roomRoutes);
-app.use("/api/s", sessionRoutes);
+app.use("/api", httpRouter);
+
+const server = http.createServer(app);
+const io = new Server(server, { cors: config });
+setupWebSocket(io);
 
 app.get("/test", (req, res) => {
     const name = req.query.name;
     res.json({ message: `hi from the server, ${name}!!` });
 });
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`server listening on port ${PORT}`);
 });

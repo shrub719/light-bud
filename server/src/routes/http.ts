@@ -1,4 +1,4 @@
-import express, { Router, Request } from "express";
+import express, { Request } from "express";
 import { Document } from "mongodb";
 import { User, Room } from "../utils/models";
 import { limit, slow } from "../utils/limiters"
@@ -6,7 +6,7 @@ import * as auth from "../utils/auth";
 import * as db from "../utils/db";
 
 require("dotenv").config();
-const router: Router = express.Router();
+const router = express.Router();
 
 
 // === USER ENDPOINTS ===
