@@ -35,12 +35,24 @@ export default function setupWebSocket(ioInstance: Server) {
         });
 
         // room
-        socket.on("join-room", async code => {
+        socket.on("create-room", async () => {
+            const code = auth.generateRandom(16);
             user = await db.joinRoom(user, code);
             socket.join(room(code));
+        })
+
+        socket.on("join-room", async code => {
+            if (!auth.validateRoomCode(code)) {
+                socket.emit("join-room-response", { error: "room-invalid" });
+                return;
+            }
+            user = await db.joinRoom(user, code);
+            socket.join(room(code));
+            socket.to(room(code)).emit("join-room");  // signal to resend active sessions
         });
 
         socket.on("leave-room", async code => {
+            if (!auth.validateRoomCode(code)) return;
             user = await db.leaveRoom(user, code);
             socket.leave(room(code));
         });

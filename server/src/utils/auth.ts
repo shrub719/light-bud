@@ -83,3 +83,9 @@ export function validateUsername(username: string) {
     const regex = /^[a-zA-Z0-9_ ]+$/;
     return regex.test(username);
 }
+
+export function validateRoomCode(code: string) {
+    // only hexadecimal characters
+    const regex = /^[0-9a-f]{32}$/;
+    return regex.test(code);
+}
