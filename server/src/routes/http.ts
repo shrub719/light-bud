@@ -60,44 +60,4 @@ router.post("/buy", slow, auth.auth, async (req: Request, res): Promise<any> => 
 });
 
 
-// === ROOM ENDPOINTS ===
-
-// admin: get list of all rooms
-router.get("/", slow, async (req, res) => {
-    if (auth.getKey(req) === process.env.PASSWORD) {
-        const rooms = await Room.find();
-        res.status(200).json(rooms);
-    } else {
-        res.status(403).send();
-    }
-});
-
-// create room
-router.post("/create", limit, auth.auth, async (req, res) => {
-    const room = new Room( {
-        code: auth.generateRandom(16),
-        uuids: [req.body.uuid]
-    });
-    const savedRoom = await room.save();
-    const updatedUser = await User.findByIdAndUpdate(
-        { _id: req.body.uuid },
-        { $addToSet: { rooms: req.body.code } },
-        { new: true }
-    );
-    res.status(201).json({ room: savedRoom, user: updatedUser });
-});
-
-// join room
-router.put("/join", slow, auth.auth, async (req, res) => db.handleRoom(req, res, 
-    { $addToSet: { uuids: req.body.uuid } },
-    { $addToSet: { rooms: req.body.code } }
-));
-
-// leave room
-router.put("/leave", slow, auth.auth, async (req, res) => db.handleRoom(req, res, 
-    { $pull: { uuids: req.body.uuid } },
-    { $pull: { rooms: req.body.code } }
-));
-
-
 export default router;

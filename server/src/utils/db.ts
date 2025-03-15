@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { User, Room } from "../utils/models"
-import { Document } from "mongodb";
+import { Document, ObjectId } from "mongodb";
 import { Request, Response } from "express";
 import * as auth from "../utils/auth";
 
@@ -15,35 +15,44 @@ export default async function connectDB() {
 };
 
 
-// === USER LOGIC ===
-
-//
-
-
-// === ROOM LOGIC ===
-
-const MAX_MEMBERS = 8
-export async function handleRoom(req: Request, res: Response, roomUpdate: object, userUpdate: object): Promise<any> {
-    const room = await Room.findOne({ code: req.body.code });
-    if (!room) return res.status(400).json({ error: "room-none" });
-    if (room.uuids.length >= MAX_MEMBERS) return res.status(400).json({ error: "room-full" });
-
-    const updatedRoom = await Room.findByIdAndUpdate(
-        { _id: room._id },
-        roomUpdate,
-        { new: true }
-    );
-    const updatedUser = await User.findByIdAndUpdate(
-        { _id: req.body.uuid },
-        userUpdate,
-        { new: true }
-    );
-    // const updatedRoom = await room.update(update);
-    // TODO: test
-    // also req.user exists, maybe use that?
-
-    if (!updatedRoom) return res.status(400).json({ error: "room-none" });
-    if (updatedRoom.uuids.length === room.uuids.length) return res.status(400).json({ error: "room-in"} );
-    if (updatedRoom.uuids.length === 0) await updatedRoom.deleteOne();
-    res.status(200).json({ room: updatedRoom, user: auth.stripAuth(updatedUser as Document) });
+export async function registerUser(req: Request) {
+    const key = auth.generateRandom();
+    const { salt, hash } = auth.hashKey(key);
+    const user = new User({
+        auth: {
+            key: hash,
+            salt: salt
+        }
+    });
+    const savedUser = await user.save();
+    return [auth.stripAuth(savedUser), key];
 }
+
+// TODO: require credentials for websocket
+export async function getUser(uuid: string, isUser=false) {
+    const user = await User.findById({ _id: uuid });
+    return [user, auth.stripAuth(user as Document, !isUser)];
+}
+
+export async function editUser(uuid: string, edits: object) {
+    const [user, strippedUser] = await getUser(uuid, true);
+}
+
+
+async function handleRoom(uuid: string, update: object) {
+    const updatedUser = await User.findByIdAndUpdate(
+        { _id: uuid },
+        update,
+        { new: true }
+    );
+    return updatedUser;
+}
+
+export const joinRoom = async (uuid: string, code: string) => handleRoom(
+    uuid, 
+    { $addToSet: { rooms: code } }
+);
+export const leaveRoom = async (uuid: string, code: string) => handleRoom(
+    uuid, 
+    { $pull: { rooms: code } }
+);
