@@ -48,13 +48,13 @@ export async function editUser(uuid: string, edits: any) {
     if (edits.profile) {
         const username = edits.profile.username;
         if (matcher.hasMatch(username)) {
-            return res.status(400).json({ error: "user-badlanguage" });
+            return { error: "user-badlanguage" };
         }
         if (!(1 <= username.length && username.length <= 20)) {
-            return res.status(400).json({ error: "user-length" });
+            return { error: "user-length" };
         }
         if (!auth.validateUsername(username)) {
-            return res.status(400).json({ error: "user-special" });
+            return { error: "user-special" };
         }
         user.profile = edits.profile;
     }
@@ -64,6 +64,7 @@ export async function editUser(uuid: string, edits: any) {
 }
 
 
+// TODO: leave room if joining another one
 async function handleRoom(uuid: string, update: object) {
     const updatedUser = await User.findByIdAndUpdate(
         { _id: uuid },
