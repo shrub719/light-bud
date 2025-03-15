@@ -34,24 +34,26 @@ export async function registerUser(req: Request) {
     return [auth.stripAuth(savedUser), key];
 }
 
-// TODO: require credentials for websocket
 export async function getUser(uuid: string): Promise<Document | Object> {
     const user = await User.findById({ _id: uuid });
     return user as Document;
 }
 
+// TODO: don't let invalid data come in
 export async function editUser(user: Document, edits: any) {
- if (edits.stats) user.stats = edits.stats;
+    if (edits.stats) user.stats = edits.stats;
     if (edits.profile) {
-        const username = edits.profile.username;
-        if (matcher.hasMatch(username)) {
-            return { error: "user-badlanguage" };
-        }
-        if (!(1 <= username.length && username.length <= 20)) {
-            return { error: "user-length" };
-        }
-        if (!auth.validateUsername(username)) {
-            return { error: "user-special" };
+        if (edits.profile.username) {
+            const username = edits.profile.username;
+            if (matcher.hasMatch(username)) {
+                return { error: "user-badlanguage" };
+            }
+            if (!(1 <= username.length && username.length <= 20)) {
+                return { error: "user-length" };
+            }
+            if (!auth.validateUsername(username)) {
+                return { error: "user-special" };
+            }
         }
         user.profile = edits.profile;
     }
