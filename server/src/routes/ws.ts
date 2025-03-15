@@ -40,6 +40,7 @@ export default function setupWebSocket(ioInstance: Server) {
                return socket.emit("edit-response", { error: err });
             }
             socket.emit("edit-response", auth.stripAuth(user));
+            socket.to(room(user.room)).emit("other-edit", auth.stripAuth(user, true));
         });
 
         socket.on("get", async () => {
