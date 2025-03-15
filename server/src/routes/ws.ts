@@ -2,12 +2,12 @@ import { Server, Socket } from "socket.io";
 import * as db from "../utils/db";
 import * as auth from "../utils/auth";
 
-function room(code: string) {
+function toRoom(code: string) {
     return "room-" + code;
 }
 
-function session(roomCode: string, sessionCode: string) {
-    return "session-" + roomCode + "-" + sessionCode;
+function toSession(code: string, id: string) {
+    return "session-" + code + "-" + id;
 }
 
 function leaveCurrentRoom(socket: Socket) {
@@ -40,7 +40,7 @@ export default function setupWebSocket(ioInstance: Server) {
                return socket.emit("edit-ack", { error: err });
             }
             socket.emit("edit-ack", auth.stripAuth(user));
-            socket.to(room(user.room)).emit("other-edit", auth.stripAuth(user, true));
+            socket.to(toRoom(user.room)).emit("other-edit", auth.stripAuth(user, true));
         });
 
         socket.on("get", async () => {
@@ -49,16 +49,16 @@ export default function setupWebSocket(ioInstance: Server) {
 
         // room
         if (user.room) {
-            socket.join(room(user.room));
+            socket.join(toRoom(user.room));
             socket.emit("room-data", await db.getRoomData(user, user.room));
-            socket.to(room(user.room)).emit("resend-sessions", socket.id);
+            socket.to(toRoom(user.room)).emit("resend-sessions", socket.id);
         }
 
         socket.on("create-room", async () => {
             leaveCurrentRoom(socket);
             const code = auth.generateRandom(16);
             user = await db.joinRoom(user, code);
-            socket.join(room(code));
+            socket.join(toRoom(code));
             socket.emit("create-room-ack", code);
         })
 
@@ -69,15 +69,15 @@ export default function setupWebSocket(ioInstance: Server) {
             leaveCurrentRoom(socket);
 
             user = await db.joinRoom(user, code);
-            socket.join(room(code));
+            socket.join(toRoom(code));
             socket.emit("room-data", await db.getRoomData(user, code));
-            socket.to(room(code)).emit("resend-sessions", socket.id);  // signal to resend active sessions
+            socket.to(toRoom(code)).emit("resend-sessions", socket.id);  // signal to resend active sessions
         });
 
         socket.on("leave-room", async code => {
             if (!auth.validateRoomCode(code)) return;
             user = await db.leaveRoom(user, code);
-            socket.leave(room(code));
+            socket.leave(toRoom(code));
             socket.emit("leave-room-ack", code);
         });
 
@@ -88,13 +88,31 @@ export default function setupWebSocket(ioInstance: Server) {
 
         // session
         socket.on("resent-session", msg => {
+            if (!user.room) return;
             const socketId = msg.id;
             const session = msg.session;
             socket.to(socketId).emit("session", session);
         });
 
+        socket.on("create-session", session => {
+            if (!user.room) return;
+            const id = auth.generateRandom(8);
+            socket.join(toSession(user.room, id));
+            session.id = id;
+            socket.to(toRoom(user.room)).emit("session", session);
+        })
+
         socket.on("send-session", session => {
-            socket.to(room(user.room)).emit("session", session);
+            if (!user.room) return;
+            socket.to(toRoom(user.room)).emit("session", session);
+        });
+
+        socket.on("join-session", id => {
+            if (!user.room) return;
+            socket.join(toSession(user.room, id));
+            socket.to(toSession(user.room, id)) 
+            // TODO: set up same stuff as rooms
+            //       including leaveCurrentSession()
         });
 
 
