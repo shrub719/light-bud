@@ -20,11 +20,3 @@ const userSchema = new mongoose.Schema({
 });
 
 export const User = mongoose.model("User", userSchema);
-
-
-const roomSchema = new mongoose.Schema({
-    code: { type: String, required: true, unique: true },
-    uuids: { type: [String], required: true },
-});
-
-export const Room = mongoose.model("Room", roomSchema);

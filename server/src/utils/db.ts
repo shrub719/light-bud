@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
-import { User, Room } from "../utils/models"
-import { Document, ObjectId } from "mongodb";
-import { Request, Response } from "express";
+import { User } from "../utils/models"
+import { Document } from "mongodb";
+import { Request } from "express";
 import * as auth from "../utils/auth";
 import { RegExpMatcher, englishDataset, englishRecommendedTransformers } from "obscenity";
 

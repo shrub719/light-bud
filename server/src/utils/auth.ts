@@ -1,7 +1,7 @@
 import crypto from "crypto";
 import { ObjectId, Document } from "mongodb";
 import { Request, Response } from "express";
-import { User, Room } from "./models";
+import { User } from "./models";
 
 export function generateRandom(length: number = 32) {
     return crypto.randomBytes(length).toString('hex');
