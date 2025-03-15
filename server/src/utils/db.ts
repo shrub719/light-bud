@@ -34,7 +34,7 @@ export async function registerUser(req: Request) {
     return [auth.stripAuth(savedUser), key];
 }
 
-export async function getUser(uuid: string): Promise<Document | Object> {
+export async function getUser(uuid: string): Promise<Document> {
     const user = await User.findById({ _id: uuid });
     return user as Document;
 }

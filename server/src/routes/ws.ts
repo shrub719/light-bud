@@ -35,6 +35,11 @@ export default function setupWebSocket(ioInstance: Server) {
         });
 
         // room
+        if (user.room) {
+            socket.join(room(user.room));
+            socket.to(room(user.room)).emit("join-room");
+        }
+
         socket.on("create-room", async () => {
             const code = auth.generateRandom(16);
             user = await db.joinRoom(user, code);
