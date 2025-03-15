@@ -37,9 +37,9 @@ export default function setupWebSocket(ioInstance: Server) {
             let err: string;
             [user, err] = await db.editUser(user, edits);
             if (err) {
-               return socket.emit("edit-response", { error: err });
+               return socket.emit("edit-ack", { error: err });
             }
-            socket.emit("edit-response", auth.stripAuth(user));
+            socket.emit("edit-ack", auth.stripAuth(user));
             socket.to(room(user.room)).emit("other-edit", auth.stripAuth(user, true));
         });
 
@@ -50,7 +50,7 @@ export default function setupWebSocket(ioInstance: Server) {
         // room
         if (user.room) {
             socket.join(room(user.room));
-            socket.emit("join-room-response", await db.getRoomData(user, user.room));
+            socket.emit("room-data", await db.getRoomData(user, user.room));
             socket.to(room(user.room)).emit("resend-sessions", socket.id);
         }
 
@@ -59,18 +59,18 @@ export default function setupWebSocket(ioInstance: Server) {
             const code = auth.generateRandom(16);
             user = await db.joinRoom(user, code);
             socket.join(room(code));
-            socket.emit("create-room-response", code);
+            socket.emit("create-room-ack", code);
         })
 
         socket.on("join-room", async code => {
             if (!auth.validateRoomCode(code)) {
-                return socket.emit("join-room-response", { error: "room-invalid" });
+                return socket.emit("room-data", { error: "room-invalid" });
             }
             leaveCurrentRoom(socket);
 
             user = await db.joinRoom(user, code);
             socket.join(room(code));
-            socket.emit("join-room-response", await db.getRoomData(user, code));
+            socket.emit("room-data", await db.getRoomData(user, code));
             socket.to(room(code)).emit("resend-sessions");  // signal to resend active sessions
         });
 
@@ -78,7 +78,7 @@ export default function setupWebSocket(ioInstance: Server) {
             if (!auth.validateRoomCode(code)) return;
             user = await db.leaveRoom(user, code);
             socket.leave(room(code));
-            socket.emit("leave-room-response", code);
+            socket.emit("leave-room-ack", code);
         });
 
 
