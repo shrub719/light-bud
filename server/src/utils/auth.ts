@@ -7,19 +7,22 @@ export function generateRandom(length: number = 32) {
     return crypto.randomBytes(length).toString('hex');
 }
 
+// generate a random salt, and return the salt and the key hashed with the salt
 export function hashKey(key: string) {
     const salt: string = crypto.randomBytes(16).toString('hex');
     const hash: string = crypto.pbkdf2Sync(key, salt, 100000, 64, 'sha512').toString('hex');
     return { salt, hash };
 }
 
+// check an unhashed sent key against a hashed stored key
 function verifyKey(sentKey: string | undefined, storedKey: string, salt: string) {
     const hash = crypto.pbkdf2Sync((sentKey as string), salt, 100000, 64, 'sha512').toString('hex');
     return hash === storedKey;
 }
 
+// remove data that doesn't need to be sent over the connection, like auth and shop data
 export function stripAuth(user: Document, isPublic: boolean = false) {
-    // public: true if data is available to any user
+    // iSPublic: true if data is available to any user
     const userObject = user.toObject();
     let strippedUser: object = {};
     if (isPublic) {
@@ -32,11 +35,13 @@ export function stripAuth(user: Document, isPublic: boolean = false) {
     return strippedUser;
 }
 
+// used as part of httpAuth, or when accessing admin endpoints
 export function getKey(req: Request) {
     return (req.headers.authorization as string).split(" ")[1];
 }
 
-export function checkKey(req: Request, user: Document) {
+// used as part of httpAuth
+function isAuthorised(req: Request, user: Document) {
     try {
         return verifyKey(getKey(req), user.auth.key, user.auth.salt);
     } catch (err) {
@@ -44,27 +49,33 @@ export function checkKey(req: Request, user: Document) {
     }
 }
 
-export async function auth(req: Request, res: Response, next: () => void): Promise<any> {
-    console.log("auth triggered")
+// auth function to get the authorised uuid of a new websocket connection
+export async function wsAuth(uuid: string | undefined, key: string) {
+    if (!uuid) return;
+    if (!ObjectId.isValid(uuid)) return;
+    const user = await User.findById({ _id: uuid }) as Document;
+    if (!user) return;
+    if (verifyKey(key, user.auth.key, user.auth.salt)) {
+        return uuid;
+    } else {
+        return;
+    }
+}
+
+// auth function for verifying the identity of http requesters
+export async function httpAuth(req: Request, res: Response, next: () => void): Promise<any> {
     let uuid = req.body.uuid;
     if (!uuid) uuid = req.query.uuid;
     if (!uuid) return res.status(400).send();
     if (!ObjectId.isValid(uuid)) return res.status(400).send();
     const user = await User.findById({ _id: uuid });
     if (!user) return res.status(400).send();
-    if (checkKey(req, user)) {
+    if (isAuthorised(req, user)) {
         req.user = user;
         next();
     } else {
         res.status(403).send();
     }
-}
-
-export async function accessRoom(req: Request, res: Response): Promise<any> {
-    const room = await Room.findOne({ code: req.body.code });
-    if (!room) return res.status(400).send();
-    if (!room.uuids.includes(req?.user?._id)) return res.status(403).json();
-    return room;
 }
 
 export function validateUsername(username: string) {

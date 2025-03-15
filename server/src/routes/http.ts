@@ -38,7 +38,7 @@ router.get("/users", slow, async (req, res) => {
 
 
 // buy something
-router.post("/buy", slow, auth.auth, async (req: Request, res): Promise<any> => {
+router.post("/buy", slow, auth.httpAuth, async (req: Request, res): Promise<any> => {
     // NOTE: req.body.item is the item to unlock
     //       remember to change result logic
     const user: any = req.user;
