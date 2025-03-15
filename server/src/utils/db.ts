@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { User } from "../utils/models"
+import { User, Room } from "../utils/models"
 import { Document } from "mongodb";
 import { Request } from "express";
 import * as auth from "../utils/auth";
@@ -40,38 +40,50 @@ export async function getUser(uuid: string): Promise<Document> {
 }
 
 // TODO: don't let invalid data come in
-export async function editUser(user: Document, edits: any) {
+export async function editUser(user: Document, edits: any): Promise<[Document, string]> {
     if (edits.stats) user.stats = edits.stats;
     if (edits.profile) {
         if (edits.profile.username) {
             const username = edits.profile.username;
             if (matcher.hasMatch(username)) {
-                return { error: "user-badlanguage" };
+                return [user, "user-badlanguage"];
             }
             if (!(1 <= username.length && username.length <= 20)) {
-                return { error: "user-length" };
+                return [user, "user-length"];
             }
             if (!auth.validateUsername(username)) {
-                return { error: "user-special" };
+                return [user, "user-special"];
             }
         }
         user.profile = edits.profile;
     }
 
     await user.save();
-    return user;
+    return [user, ""];
 }
 
 
-// TODO: leave room if joining another one
 export async function joinRoom(user: Document, code: string) {
     user.room = code;
     await user.save();
+
+    await Room.findOneAndUpdate(
+        { code: code },
+        { $addToSet: { uuids: user._id } },
+        { upsert: true }
+    );
+
     return user;
 }
 
 export async function leaveRoom(user: Document, code: string) {
     user.room = "";
     await user.save();
+
+    await Room.findOneAndUpdate(
+        { code: code },
+        { $pull: { uuids: user._id } }
+    );
+
     return user;
 }

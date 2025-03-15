@@ -34,7 +34,11 @@ export default function setupWebSocket(ioInstance: Server) {
 
         // user
         socket.on("edit", async edits => {
-            user = await db.editUser(user, edits);
+            let err: string;
+            [user, err] = await db.editUser(user, edits);
+            if (err) {
+               return socket.emit("edit-response", { error: err });
+            }
             socket.emit("edit-response", auth.stripAuth(user));
         });
 
@@ -53,17 +57,18 @@ export default function setupWebSocket(ioInstance: Server) {
             const code = auth.generateRandom(16);
             user = await db.joinRoom(user, code);
             socket.join(room(code));
+            socket.emit("create-room-response", code);
         })
 
         socket.on("join-room", async code => {
             if (!auth.validateRoomCode(code)) {
-                socket.emit("join-room-response", { error: "room-invalid" });
-                return;
+                return socket.emit("join-room-response", { error: "room-invalid" });
             }
             leaveCurrentRoom(socket);
 
             user = await db.joinRoom(user, code);
             socket.join(room(code));
+            socket.emit("join-room-response", code);  // TODO: send user data
             socket.to(room(code)).emit("resend-sessions");  // signal to resend active sessions
         });
 
@@ -71,6 +76,7 @@ export default function setupWebSocket(ioInstance: Server) {
             if (!auth.validateRoomCode(code)) return;
             user = await db.leaveRoom(user, code);
             socket.leave(room(code));
+            socket.emit("leave-room-response", code);
         });
 
 
