@@ -71,7 +71,7 @@ export default function setupWebSocket(ioInstance: Server) {
             user = await db.joinRoom(user, code);
             socket.join(room(code));
             socket.emit("room-data", await db.getRoomData(user, code));
-            socket.to(room(code)).emit("resend-sessions");  // signal to resend active sessions
+            socket.to(room(code)).emit("resend-sessions", socket.id);  // signal to resend active sessions
         });
 
         socket.on("leave-room", async code => {
@@ -85,6 +85,19 @@ export default function setupWebSocket(ioInstance: Server) {
         socket.on("disconnect", () => {
             console.log(socket.id + ": user disconnected");
         });
+
+        // session
+        socket.on("resent-session", msg => {
+            const socketId = msg.id;
+            const session = msg.session;
+            socket.to(socketId).emit("session", session);
+        });
+
+        socket.on("send-session", session => {
+            socket.to(room(user.room)).emit("session", session);
+        });
+
+
     });
 
     ioInstance.of("/").adapter.on("join-room", (room, id) => {
