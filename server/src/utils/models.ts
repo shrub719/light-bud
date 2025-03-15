@@ -19,4 +19,11 @@ const userSchema = new mongoose.Schema({
     }
 });
 
+const roomSchema = new mongoose.Schema({
+    code: { type: String, required: true },
+    uuids: { type: [String], default: [] }
+});
+
+
 export const User = mongoose.model("User", userSchema);
+export const Room = mongoose.model("Room", roomSchema);
