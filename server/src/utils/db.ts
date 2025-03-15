@@ -87,3 +87,12 @@ export async function leaveRoom(user: Document, code: string) {
 
     return user;
 }
+
+export async function getRoomData(requestingUser: Document, code: string) {
+    const room: Document = await Room.findOne({ code: code }) as Document;
+    const requestingUuid = requestingUser._id.toString();
+    const uuids = room.uuids.filter((uuid: string) => (uuid != requestingUuid));
+    const users = await User.find({ _id: { $in: uuids } });
+    const strippedUsers = users.map((user: Document) => auth.stripAuth(user, true));
+    return strippedUsers
+}

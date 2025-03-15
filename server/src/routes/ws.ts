@@ -49,7 +49,8 @@ export default function setupWebSocket(ioInstance: Server) {
         // room
         if (user.room) {
             socket.join(room(user.room));
-            socket.to(room(user.room)).emit("join-room");
+            socket.emit("join-room-response", await db.getRoomData(user, user.room));
+            socket.to(room(user.room)).emit("resend-sessions", socket.id);
         }
 
         socket.on("create-room", async () => {
@@ -68,7 +69,7 @@ export default function setupWebSocket(ioInstance: Server) {
 
             user = await db.joinRoom(user, code);
             socket.join(room(code));
-            socket.emit("join-room-response", code);  // TODO: send user data
+            socket.emit("join-room-response", await db.getRoomData(user, code));
             socket.to(room(code)).emit("resend-sessions");  // signal to resend active sessions
         });
 
