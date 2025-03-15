@@ -1,4 +1,4 @@
-import { Server } from "socket.io";
+import { Server, Socket } from "socket.io";
 import * as db from "../utils/db";
 import * as auth from "../utils/auth";
 
@@ -8,6 +8,14 @@ function room(code: string) {
 
 function session(roomCode: string, sessionCode: string) {
     return "session-" + roomCode + "-" + sessionCode;
+}
+
+function leaveCurrentRoom(socket: Socket) {
+    const socketRooms = Array.from(socket.rooms);
+    const rooms = socketRooms.filter(room => room.split("-")[0] === "room");
+    if (rooms.length >= 1) {
+        socket.leave(rooms[0]);
+    }
 }
 
 export default function setupWebSocket(ioInstance: Server) {
@@ -41,6 +49,7 @@ export default function setupWebSocket(ioInstance: Server) {
         }
 
         socket.on("create-room", async () => {
+            leaveCurrentRoom(socket);
             const code = auth.generateRandom(16);
             user = await db.joinRoom(user, code);
             socket.join(room(code));
@@ -51,11 +60,7 @@ export default function setupWebSocket(ioInstance: Server) {
                 socket.emit("join-room-response", { error: "room-invalid" });
                 return;
             }
-            const socketRooms = Array.from(socket.rooms);
-            const rooms = socketRooms.filter(room => room.split("-")[0] === "room");
-            if (rooms.length >= 1) {
-                socket.leave(rooms[0]);
-            }
+            leaveCurrentRoom(socket);
 
             user = await db.joinRoom(user, code);
             socket.join(room(code));
