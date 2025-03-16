@@ -24,10 +24,9 @@ export function roomCode(code: string) {
     return regex.test(code);
 }
 
-export function sessionId(id: string, ioInstance: Server): string {
+export function sessionId(roomName: string, ioInstance: Server): string {
     const regex = /^[0-9a-f]{16}$/;
-    if (!regex.test(id)) return "session-badId"
-    if (!ioInstance.sockets.adapter.rooms.has(id)) return "session-doesNotExist"
+    if (!ioInstance.sockets.adapter.rooms.has(roomName)) return "session-doesNotExist"
     return "";
 }
 
