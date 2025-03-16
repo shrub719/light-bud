@@ -1,6 +1,7 @@
 import { Server, Socket } from "socket.io";
 import * as db from "../utils/db";
 import * as auth from "../utils/auth";
+import * as valid from "../utils/validation";
 
 function toRoom(code: string) {
     return "room-" + code;
@@ -36,9 +37,7 @@ export default function setupWebSocket(ioInstance: Server) {
         socket.on("edit", async edits => {
             let err: string;
             [user, err] = await db.editUser(user, edits);
-            if (err) {
-               return socket.emit("edit-ack", { error: err });
-            }
+            if (err) return socket.emit("edit-ack", { error: err });
             socket.emit("edit-ack", auth.stripAuth(user));
             socket.to(toRoom(user.room)).emit("other-edit", auth.stripAuth(user, true));
         });
@@ -63,7 +62,7 @@ export default function setupWebSocket(ioInstance: Server) {
         })
 
         socket.on("join-room", async code => {
-            if (!auth.validateRoomCode(code)) {
+            if (!valid.roomCode(code)) {
                 return socket.emit("room-data", { error: "room-invalid" });
             }
             leaveCurrentRoom(socket);
@@ -75,7 +74,7 @@ export default function setupWebSocket(ioInstance: Server) {
         });
 
         socket.on("leave-room", async code => {
-            if (!auth.validateRoomCode(code)) return;
+            if (!valid.roomCode(code)) return;
             user = await db.leaveRoom(user, code);
             socket.leave(toRoom(code));
             socket.emit("leave-room-ack", code);

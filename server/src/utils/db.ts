@@ -3,12 +3,8 @@ import { User, Room } from "../utils/models"
 import { Document } from "mongodb";
 import { Request } from "express";
 import * as auth from "../utils/auth";
-import { RegExpMatcher, englishDataset, englishRecommendedTransformers } from "obscenity";
+import * as valid from "../utils/validation";
 
-const matcher = new RegExpMatcher({
-    ...englishDataset.build(),
-    ...englishRecommendedTransformers,
-});
 
 export default async function connectDB() {
     try {
@@ -41,22 +37,10 @@ export async function getUser(uuid: string): Promise<Document> {
 
 // TODO: don't let invalid data come in
 export async function editUser(user: Document, edits: any): Promise<[Document, string]> {
+    const err = valid.edits(edits);
+    if (err) return [user, err];
     if (edits.stats) user.stats = edits.stats;
-    if (edits.profile) {
-        if (edits.profile.username) {
-            const username = edits.profile.username;
-            if (matcher.hasMatch(username)) {
-                return [user, "user-badlanguage"];
-            }
-            if (!(1 <= username.length && username.length <= 20)) {
-                return [user, "user-length"];
-            }
-            if (!auth.validateUsername(username)) {
-                return [user, "user-special"];
-            }
-        }
-        user.profile = edits.profile;
-    }
+    if (edits.profile) user.profile = edits.profile;
 
     await user.save();
     return [user, ""];

@@ -77,15 +77,3 @@ export async function httpAuth(req: Request, res: Response, next: () => void): P
         res.status(403).send();
     }
 }
-
-export function validateUsername(username: string) {
-    // allow only alphanumeric characters and underscores
-    const regex = /^[a-zA-Z0-9_ ]+$/;
-    return regex.test(username);
-}
-
-export function validateRoomCode(code: string) {
-    // only hexadecimal characters
-    const regex = /^[0-9a-f]{32}$/;
-    return regex.test(code);
-}
