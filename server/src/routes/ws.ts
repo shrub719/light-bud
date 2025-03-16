@@ -116,8 +116,6 @@ export default function setupWebSocket(ioInstance: Server) {
             leaveCurrentSession(socket);
             socket.join(toSession(user.room, id));
             socket.to(toSession(user.room, id)).emit("session-user-joined", user._id);
-            // TODO: set up same stuff as rooms
-            //       including leaveCurrentSession()
         });
 
 
@@ -134,6 +132,8 @@ export default function setupWebSocket(ioInstance: Server) {
     });
 
     ioInstance.of("/").adapter.on("leave-room", (room, id) => {
-        console.log(room + ": socket", id, "left");
+        if (room !== id) {
+            console.log(room + ": socket", id, "left");
+        }
     });
 }
