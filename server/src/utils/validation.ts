@@ -24,9 +24,8 @@ export function roomCode(code: string) {
     return regex.test(code);
 }
 
-export function sessionId(roomName: string, ioInstance: Server): string {
-    const regex = /^[0-9a-f]{16}$/;
-    if (!ioInstance.sockets.adapter.rooms.has(roomName)) return "session-doesNotExist"
+export function sessionName(name: string, ioInstance: Server): string {
+    if (!ioInstance.sockets.adapter.rooms.has(name)) return "session-doesNotExist"
     return "";
 }
 
@@ -54,5 +53,16 @@ export function edits(edits: any): string {
         if (!validIconTypes.includes(type)) return "profile-badIconType";
         if (!validIconColours.includes(colour)) return "profile-badIconColour";
     }
+    return "";
+}
+
+export function sessionId(id: string): boolean {
+    return /^[0-9a-f]{16}$/.test(id);
+}
+
+export function sessionData(session: any, hasId=true): string {
+    if (!session) return "session-noSession";
+    if (typeof session.start !== "number" || typeof session.end !== "number") return "session-badSession";
+    if (hasId && !sessionId(session.id)) return "session-invalidId"
     return "";
 }

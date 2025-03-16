@@ -86,23 +86,22 @@ export default function setupWebSocket(ioInstance: Server) {
         // session
         socket.on("resent-session", msg => {
             if (!user.room) return;
-            const socketId = msg.id;
+            const err = valid.sessionData(msg.session);
+            if (err) return socket.emit("error", err);
+            const socketId = msg.socketId;
             const session = msg.session;
             socket.to(socketId).emit("session", session);
         });
 
         socket.on("start-session", session => {
             if (!user.room) return;
+            const err = valid.sessionData(session, false);
+            if (err) return socket.emit("error", err);
             const id = auth.generateRandom(8);
             socket.join(toSession(user.room, id));
             session.id = id;
             socket.to(toRoom(user.room)).emit("session", session);
         })
-
-        socket.on("send-session", session => {
-            if (!user.room) return;
-            socket.to(toRoom(user.room)).emit("session", session);
-        });
 
         socket.on("join-session", id => {
             if (!user.room) return;
