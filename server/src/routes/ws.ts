@@ -19,6 +19,14 @@ function leaveCurrentRoom(socket: Socket) {
     }
 }
 
+function leaveCurrentSession(socket: Socket) {
+    const socketRooms = Array.from(socket.rooms);
+    const sessions = socketRooms.filter(room => room.split("-")[0] == "session");
+    if (sessions.length >= 1) {
+        socket.leave(sessions[0]);
+    }
+}
+
 export default function setupWebSocket(ioInstance: Server) {
     ioInstance.on("connection", async (socket) => {
         // authentication
@@ -39,7 +47,7 @@ export default function setupWebSocket(ioInstance: Server) {
             [user, err] = await db.editUser(user, edits);
             if (err) return socket.emit("error", err);
             socket.emit("edit-ack", auth.stripAuth(user));   // TODO: don't transfer data with acks?
-            socket.to(toRoom(user.room)).emit("other-edit", auth.stripAuth(user, true));
+            socket.to(toRoom(user.room)).emit("user-data", auth.stripAuth(user, true));
         });
 
         socket.on("get", async () => {
@@ -68,6 +76,7 @@ export default function setupWebSocket(ioInstance: Server) {
             user = await db.joinRoom(user, code);
             socket.join(toRoom(code));
             socket.emit("room-data", await db.getRoomData(user, code));
+            socket.to(toRoom(code)).emit("user-data", auth.stripAuth(user, true));
             socket.to(toRoom(code)).emit("resend-sessions", socket.id);  // signal to resend active sessions
         });
 
@@ -78,10 +87,6 @@ export default function setupWebSocket(ioInstance: Server) {
             socket.emit("leave-room-ack", code);
         });
 
-
-        socket.on("disconnect", () => {
-            console.log(socket.id + ": user disconnected");
-        });
 
         // session
         socket.on("resent-session", msg => {
@@ -98,6 +103,7 @@ export default function setupWebSocket(ioInstance: Server) {
             const err = valid.sessionData(session, false);
             if (err) return socket.emit("error", err);
             const id = auth.generateRandom(8);
+            leaveCurrentSession(socket);
             socket.join(toSession(user.room, id));
             session.id = id;
             socket.to(toRoom(user.room)).emit("session", session);
@@ -105,13 +111,20 @@ export default function setupWebSocket(ioInstance: Server) {
 
         socket.on("join-session", id => {
             if (!user.room) return;
+            const err = valid.sessionName(toSession(user.room, id), ioInstance);
+            if (err) return socket.emit("error", err);
+            leaveCurrentSession(socket);
             socket.join(toSession(user.room, id));
-            socket.to(toSession(user.room, id)) 
+            socket.to(toSession(user.room, id)).emit("session-user-joined", user._id);
             // TODO: set up same stuff as rooms
             //       including leaveCurrentSession()
         });
 
 
+        socket.on("disconnect", () => {
+            leaveCurrentSession(socket);
+            console.log(socket.id + ": user disconnected");
+        });
     });
 
     ioInstance.of("/").adapter.on("join-room", (room, id) => {
