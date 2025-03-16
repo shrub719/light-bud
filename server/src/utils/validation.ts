@@ -37,22 +37,22 @@ export function usrname(username: string) {
 }
 
 export function edits(edits: any): string {
-    if (!edits) return "edit-noedits";
+    if (!edits) return "edit-noEdits";
     if (edits.stats) {
-        if (!edits.stats.focusHours) return "stats-badstats";
+        if (!edits.stats.focusHours) return "stats-badStats";
     }
     if (edits.profile) {
         const username = edits.profile.username;
         const icon = edits.profile.icon
-        if (!username) return "profile-nousername";
-        if (matcher.hasMatch(username)) return "profile-badlanguage";
-        if (!(1 <= username.length && username.length <= 20)) return "profile-usernamelength";
-        if (!usrname(username)) return "profile-specialcharacters";
-        if (!icon) return "profile-noicon";
-        if (icon.length !== 2) return "profile-badicon";
+        if (!username) return "profile-noUsername";
+        if (matcher.hasMatch(username)) return "profile-badLanguage";
+        if (!(1 <= username.length && username.length <= 20)) return "profile-usernameLength";
+        if (!usrname(username)) return "profile-specialCharacters";
+        if (!icon) return "profile-noIcon";
+        if (icon.length !== 2) return "profile-badIcon";
         const [type, colour] = icon;
-        if (!validIconTypes.includes(type)) return "profile-badtype";
-        if (!validIconColours.includes(colour)) return "profile-badcolour";
+        if (!validIconTypes.includes(type)) return "profile-badIconType";
+        if (!validIconColours.includes(colour)) return "profile-badIconColour";
     }
     return "";
 }
