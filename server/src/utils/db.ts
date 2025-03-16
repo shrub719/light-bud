@@ -65,8 +65,9 @@ export async function leaveRoom(user: Document, code: string) {
 
     await Room.findOneAndUpdate(
         { code: code },
-        { $pull: { uuids: user._id } }
+        { $pull: { uuids: user._id } },
     );
+    await Room.findOneAndDelete({ uuids: { $size: 0 } });
 
     return user;
 }
