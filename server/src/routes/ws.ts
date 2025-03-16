@@ -73,6 +73,7 @@ export default function setupWebSocket(ioInstance: Server) {
             if (!valid.roomCode(code)) return socket.emit("error", "room-invalidCode");
             leaveCurrentRoom(socket);
 
+            if (user.room) await db.leaveRoom(user, user.room);
             user = await db.joinRoom(user, code);
             socket.join(toRoom(code));
             socket.emit("room-data", await db.getRoomData(user, code));
