@@ -20,7 +20,7 @@ import httpRouter from "./routes/http";
 const PORT = process.env.PORT || "3002";
 const app = express();
 const config = {
-    origin: "*",  // FIXME !!!
+    origin: "http://localhost:3002",  // FIXME !!!
     methods: ["GET", "POST", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"]
 };
