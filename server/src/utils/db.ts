@@ -35,7 +35,6 @@ export async function getUser(uuid: string): Promise<Document> {
     return user as Document;
 }
 
-// TODO: don't let invalid data come in
 export async function editUser(user: Document, edits: any): Promise<[Document, string]> {
     const err = valid.edits(edits);
     if (err) return [user, err];

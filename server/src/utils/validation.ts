@@ -28,13 +28,14 @@ export function sessionId(id: string) {
     return regex.test(id);
 }
 
-export function username(username: string) {
+export function usrname(username: string) {
     // allow only alphanumeric characters and underscores
     const regex = /^[a-zA-Z0-9_ ]+$/;
     return regex.test(username);
 }
 
 export function edits(edits: any): string {
+    if (!edits) return "edit-noedits";
     if (edits.stats) {
         if (!edits.stats.focusHours) return "stats-badstats";
     }
@@ -44,7 +45,7 @@ export function edits(edits: any): string {
         if (!username) return "profile-nousername";
         if (matcher.hasMatch(username)) return "profile-badlanguage";
         if (!(1 <= username.length && username.length <= 20)) return "profile-usernamelength";
-        if (!username(username)) return "profile-specialcharacters";
+        if (!usrname(username)) return "profile-specialcharacters";
         if (!icon) return "profile-noicon";
         if (icon.length !== 2) return "profile-badicon";
         const [type, colour] = icon;
