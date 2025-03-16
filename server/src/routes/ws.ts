@@ -107,6 +107,7 @@ export default function setupWebSocket(ioInstance: Server) {
             socket.join(toSession(user.room, id));
             session.id = id;
             socket.to(toRoom(user.room)).emit("session", session);
+            socket.emit("start-session-ack", id);
         })
 
         socket.on("join-session", id => {
