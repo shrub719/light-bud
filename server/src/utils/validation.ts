@@ -1,3 +1,4 @@
+import { Server } from "socket.io";
 import { RegExpMatcher, englishDataset, englishRecommendedTransformers } from "obscenity";
 const matcher = new RegExpMatcher({
     ...englishDataset.build(),
@@ -23,9 +24,11 @@ export function roomCode(code: string) {
     return regex.test(code);
 }
 
-export function sessionId(id: string) {
-    const regex = /^[0-9a-f]{16}$/
-    return regex.test(id);
+export function sessionId(id: string, ioInstance: Server): string {
+    const regex = /^[0-9a-f]{16}$/;
+    if (!regex.test(id)) return "session-badId"
+    if (!ioInstance.sockets.adapter.rooms.has(id)) return "session-doesNotExist"
+    return "";
 }
 
 export function usrname(username: string) {
