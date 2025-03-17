@@ -55,6 +55,7 @@ export default function setupWebSocket(ioInstance: Server) {
         socket.on("get", async () => {
             socket.emit("user", auth.stripAuth(user))
         });
+        
 
         // room
         if (user.room) {
@@ -111,7 +112,7 @@ export default function setupWebSocket(ioInstance: Server) {
             session.id = id;
             socket.to(toRoom(user.room)).emit("session", session);
             socket.emit("start-session-ack", id);
-        })
+        });
 
         socket.on("join-session", id => {
             if (!user.room) return;
