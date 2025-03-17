@@ -21,7 +21,7 @@ function leaveCurrentRoom(socket: Socket) {
 
 function leaveCurrentSession(socket: Socket) {
     const socketRooms = Array.from(socket.rooms);
-    const sessions = socketRooms.filter(room => room.split("-")[0] == "session");
+    const sessions = socketRooms.filter(room => room.split("-")[0] === "session");
     if (sessions.length >= 1) {
         socket.leave(sessions[0]);
     }
@@ -47,7 +47,9 @@ export default function setupWebSocket(ioInstance: Server) {
             [user, err] = await db.editUser(user, edits);
             if (err) return socket.emit("error", err);
             socket.emit("edit-ack", auth.stripAuth(user));   // TODO: don't transfer data with acks?
-            socket.to(toRoom(user.room)).emit("user-data", auth.stripAuth(user, true));
+            if (user.room) {
+                socket.to(toRoom(user.room)).emit("user-data", auth.stripAuth(user, true));
+            }
         });
 
         socket.on("get", async () => {
