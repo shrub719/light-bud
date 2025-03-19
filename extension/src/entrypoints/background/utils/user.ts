@@ -1,3 +1,12 @@
+interface User {
+    uuid: string,
+    key: string,
+    stats: object,
+    profile: object,
+    room: string,
+    shop: object,
+}
+
 export async function register(): Promise<boolean> {
     const response = await fetch("http://localhost:3002/api/register", {
         method: "POST"
