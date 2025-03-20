@@ -7,6 +7,11 @@ interface User {
     shop: object,
 }
 
+// TODO: JSON.stringify?
+async function save(field: string, value: object) {
+    await browser.storage.local.set({field: value});
+}
+
 export async function register(): Promise<boolean> {
     const response = await fetch("http://localhost:3002/api/register", {
         method: "POST"
