@@ -14,4 +14,3 @@ Fork and clone this repository to start working.
 ## Licensing
 
 The code is licensed under the [GNU AGPLv3](https://spdx.org/licenses/AGPL-3.0-or-later.html).
-<!-- TODO: add dual license for assets -->
