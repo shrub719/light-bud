@@ -14,5 +14,6 @@ Fork and clone this repository to start working.
   
 ## Licensing
 
-The code is licensed under the [GNU AGPLv3](https://spdx.org/licenses/AGPL-3.0-or-later.html).
-<!-- TODO: add license for assets -->
+The code is licensed under the [GNU AGPLv3](https://spdx.org/licenses/AGPL-3.0-or-later.html).  
+The assets (animations) are licensed under the [CC BY-NC-SA](https://creativecommons.org/licenses/by-nc-sa/4.0/).
+<!-- TODO: add license to assets directory and link -->
