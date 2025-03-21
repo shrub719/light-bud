@@ -11,6 +11,8 @@ Fork and clone this repository to start working.
 - [Server](server/README.md)
 - [Extension](extension/README.md)
 
-## Licensing
+  
+<h2>Licensing</h2>
 
 The code is licensed under the [GNU AGPLv3](https://spdx.org/licenses/AGPL-3.0-or-later.html).
+<!-- TODO: add dual license for assets -->
