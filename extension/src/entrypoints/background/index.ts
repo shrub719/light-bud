@@ -7,12 +7,12 @@ export default defineBackground({
     main() {
         // extension starts
         let user: u.User;
+        let ok;
         (async () => {
-            let ok;
             [user, ok] = await u.load();
-            console.log("userinside: " + user);
+            console.log(user);
         })();
-        console.log("user: " + user);
+
 
         // first install
         browser.runtime.onInstalled.addListener(async ({ reason }: any) => {
