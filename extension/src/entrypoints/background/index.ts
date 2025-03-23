@@ -1,4 +1,5 @@
 import * as u from "./utils/user";
+import { onMessage } from "webext-bridge/background";
 
 export default defineBackground({
     persistent: true,
