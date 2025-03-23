@@ -27,6 +27,7 @@ function leaveCurrentSession(socket: Socket) {
     }
 }
 
+// TODO: rate limit
 export default function setupWebSocket(ioInstance: Server) {
     ioInstance.on("connection", async (socket) => {
         // authentication
