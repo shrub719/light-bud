@@ -1,5 +1,6 @@
-import * as u from "./utils/user";
 import { onMessage } from "webext-bridge/background";
+import { io } from "socket.io-client";
+import * as u from "./utils/user";
 
 export default defineBackground({
     persistent: true,
