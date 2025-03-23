@@ -1,4 +1,4 @@
-import * as user from "./utils/user";
+import * as u from "./utils/user";
 
 export default defineBackground({
     persistent: true,
@@ -9,7 +9,7 @@ export default defineBackground({
         browser.runtime.onInstalled.addListener(async ({ reason }: any) => {
             if (reason === "install") {
                 console.log("extension installed");
-                const ok = await register();
+                const ok = await u.register();
             }
         });
 
