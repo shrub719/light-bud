@@ -1,4 +1,4 @@
-import { register } from "./utils/user";
+import * as user from "./utils/user";
 
 export default defineBackground({
     persistent: true,

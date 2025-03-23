@@ -26,13 +26,13 @@ export interface User {
     shop: Shop,
 }
 
-const userItem = storage.defineItem<User>("local:user")
+const userItem = storage.defineItem<User>("local:user");
 
-export async function saveUser(user: User) {
-    await userItem.setValue(user)
+export async function save(user: User) {
+    await userItem.setValue(user);
 }
 
-export async function loadUser(): Promise<[boolean, User | null]> {
+export async function load(): Promise<[boolean, User | null]> {
     const user = await userItem.getValue();
     if (!user) return [false, null];
     return [true, user];
