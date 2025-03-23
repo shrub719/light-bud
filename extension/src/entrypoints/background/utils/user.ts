@@ -57,10 +57,3 @@ export async function register(): Promise<boolean> {
     console.log("user initialised");
     return true;
 }
-
-// wrapper function that every response containing the user's own data is passed through
-export async function verifyShop(json: any): Promise<void> {
-    await browser.storage.local.set({
-        shop: json.shop
-    });
-}
