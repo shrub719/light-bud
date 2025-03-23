@@ -1,15 +1,40 @@
-interface User {
+import { storage } from "wxt/storage";
+
+interface Auth {
     uuid: string,
-    key: string,
-    stats: object,
-    profile: object,
+    key: string
+}
+
+interface Stats {
+    focusHours: number
+}
+
+interface Profile {
+    username: string,
+    icon: [string, string]
+}
+
+interface Shop {
+    unlocked: string[]
+}
+
+export interface User {
+    auth: Auth
+    stats: Stats,
+    profile: Profile,
     room: string,
     shop: object,
 }
 
-// TODO: JSON.stringify?
-async function save(field: string, value: object) {
-    await browser.storage.local.set({field: value});
+const userItem = storage.defineItem<User>("local:user")
+
+// export async function save(field, value) {
+// }
+
+export async function loadUser(): Promise<[boolean, User | null]> {
+    const user = await userItem.getValue();
+    if (!user) return [false, null];
+    return [true, user];
 }
 
 export async function register(): Promise<boolean> {
@@ -21,19 +46,17 @@ export async function register(): Promise<boolean> {
 
     const json = await response.json();
     console.log(json);
-    await browser.storage.local.set({
-        uuid: json.user._id,
-        key: json.unhashedKey,
+    await userItem.setValue({
+        auth: { uuid: json.user._id, key: json.unhashedKey },
         stats: json.user.stats,
         profile: json.user.profile,
         room: json.user.room,
         shop: json.user.shop
-    });
+    })
     console.log("user initialised");
     return true;
 }
 
-// TODO: make a typescript type for the user object?
 // wrapper function that every response containing the user's own data is passed through
 export async function verifyShop(json: any): Promise<void> {
     await browser.storage.local.set({
