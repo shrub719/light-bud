@@ -7,11 +7,10 @@ export default defineBackground({
     main() {
         // extension starts
         let user: u.User;
-        let ok;
-        (async () => {
-            [user, ok] = await u.load();
-            console.log(user);
-        })();
+        u.load().then((value) => {
+            user = value[0];
+            console.log(user);  // TODO: what happens when user is null?
+        });
 
 
         // first install
