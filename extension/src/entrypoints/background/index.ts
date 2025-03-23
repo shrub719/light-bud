@@ -3,13 +3,13 @@ import * as u from "./utils/user";
 export default defineBackground({
     persistent: true,
     main() {
+        let user: u.User | null;
         // first install
-        // TODO: what if server isn't online/available?
-        // TODO: remember to change urls from localhost
         browser.runtime.onInstalled.addListener(async ({ reason }: any) => {
             if (reason === "install") {
                 console.log("extension installed");
-                const ok = await u.register();
+                let ok;
+                [user, ok] = await u.register();
             }
         });
 

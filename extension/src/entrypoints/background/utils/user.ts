@@ -32,28 +32,31 @@ export async function save(user: User) {
     await userItem.setValue(user);
 }
 
-export async function load(): Promise<[boolean, User | null]> {
+export async function load(): Promise<[User | null, boolean]> {
     const user = await userItem.getValue();
-    if (!user) return [false, null];
-    return [true, user];
+    if (!user) return [null, false];
+    return [user, true];
 }
 
-export async function register(): Promise<boolean> {
+// TODO: what if server isn't online/available?
+// TODO: remember to change urls from localhost
+export async function register(): Promise<[User | null, boolean]> {
     const response = await fetch("http://localhost:3002/api/register", {
         method: "POST"
     });
 
-    if (!response.ok) return false;
+    if (!response.ok) return [null, false];
 
     const json = await response.json();
     console.log(json);
-    await userItem.setValue({
+    const user = {
         auth: { uuid: json.user._id, key: json.unhashedKey },
         stats: json.user.stats,
         profile: json.user.profile,
         room: json.user.room,
         shop: json.user.shop
-    });
+    };
+    await userItem.setValue(user);
     console.log("user initialised");
-    return true;
+    return [user, true];
 }
