@@ -12,7 +12,7 @@ export default defineBackground({
             if (reason === "install") {
                 console.log("extension installed");
                 let ok;
-                [user, ok] = await u.register() as [u.User, boolean];  // FIX
+                [user, ok] = await u.register();
             }
         });
 

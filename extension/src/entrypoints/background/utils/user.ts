@@ -32,20 +32,20 @@ export async function save(user: User) {
     await userItem.setValue(user);
 }
 
-export async function load(): Promise<[User | null, boolean]> {
+export async function load(): Promise<[User, boolean]> {
     const user = await userItem.getValue();
-    if (!user) return [null, false];
+    if (!user) return [null as unknown as User, false];
     return [user, true];
 }
 
 // TODO: what if server isn't online/available?
 // TODO: remember to change urls from localhost
-export async function register(): Promise<[User | null, boolean]> {
+export async function register(): Promise<[User, boolean]> {
     const response = await fetch("http://localhost:3002/api/register", {
         method: "POST"
     });
 
-    if (!response.ok) return [null, false];
+    if (!response.ok) return [null as unknown as User, false];
 
     const json = await response.json();
     console.log(json);
