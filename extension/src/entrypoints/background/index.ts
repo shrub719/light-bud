@@ -5,7 +5,13 @@ import * as u from "./utils/user";
 export default defineBackground({
     persistent: true,
     main() {
+        // extension starts
         let user: u.User;
+        (async () => {
+            let ok;
+            [user, ok] = await u.load();
+        })();
+        console.log("user: ");
 
         // first install
         browser.runtime.onInstalled.addListener(async ({ reason }: any) => {
@@ -16,11 +22,16 @@ export default defineBackground({
             }
         });
 
+
         // messages
         onMessage("set-profile", ({ profile }: any) => {  // FIX
             user.profile = profile;
             u.save(user);
         });
+
+
+        // ws
+        
 
         console.log("hello from background.ts!", { id: browser.runtime.id });
     },
