@@ -23,13 +23,14 @@ export interface User {
     stats: Stats,
     profile: Profile,
     room: string,
-    shop: object,
+    shop: Shop,
 }
 
 const userItem = storage.defineItem<User>("local:user")
 
-// export async function save(field, value) {
-// }
+export async function saveUser(user: User) {
+    await userItem.setValue(user)
+}
 
 export async function loadUser(): Promise<[boolean, User | null]> {
     const user = await userItem.getValue();
@@ -52,7 +53,7 @@ export async function register(): Promise<boolean> {
         profile: json.user.profile,
         room: json.user.room,
         shop: json.user.shop
-    })
+    });
     console.log("user initialised");
     return true;
 }
